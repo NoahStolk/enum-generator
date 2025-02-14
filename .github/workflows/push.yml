@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+    - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Set up dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '9.0.200'
+        include-prerelease: false
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build
+      run: dotnet build src/EnumGenerator.slnx -c Release
+    - name: Test
+      run: |
+        cd src/
+        dotnet test EnumGenerator.slnx -c Release --no-build
+        dotnet pack -c Release -o ./artifacts -p:Version=0.0.0-temp
+        dotnet restore EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj --packages ./packages --configfile "nuget.integration-tests.config"
+        dotnet build EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj -c Release --packages ./packages --no-restore
+        dotnet test EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj -c Release --no-build --no-restore
+    - name: Pack
+      run: |
+        cd src/
+        dotnet pack -c Release -o .
+    - name: Push
+      run: |
+        cd src/
+        dotnet nuget push *.nupkg -s nuget.org -k ${NUGET_SECRET} -n --skip-duplicate
+      env:
+        NUGET_SECRET: ${{ secrets.NUGET_SECRET }}

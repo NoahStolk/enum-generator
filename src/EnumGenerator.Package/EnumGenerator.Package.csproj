@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package configuration">
+    <PackageId>NoahStolk.EnumGenerator</PackageId>
+    <Version>0.0.0-alpha.0</Version>
+    <Authors>Noah Stolk</Authors>
+    <Copyright>Copyright © Noah Stolk</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/NoahStolk/EnumGenerator</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/NoahStolk/EnumGenerator</PackageProjectUrl>
+    <Description>EnumGenerator is a C# source generator for enums.</Description>
+    <PackageTags>enums, source generator</PackageTags>
+    <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <DevelopmentDependency>true</DevelopmentDependency>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" Visible="false"/>
+    <None Include="$(OutputPath)\EnumGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Include="$(OutputPath)\EnumGenerator.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Include="$(OutputPath)\EnumGenerator.Attributes.dll" Pack="true" PackagePath="lib/netstandard2.0" Visible="false"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EnumGenerator.Attributes\EnumGenerator.Attributes.csproj" PrivateAssets="all"/>
+    <ProjectReference Include="..\EnumGenerator\EnumGenerator.csproj" PrivateAssets="all"/>
+  </ItemGroup>
+
+</Project>
