@@ -62,7 +62,22 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 				EnumName = enumType.Name,
 				NamespaceName = enumType.ContainingNamespace.ToDisplayString(),
 				Accessibility = "public",
-				Members = enumType.GetMembers().Where(m => m.Kind == SymbolKind.Field).ToDictionary(m => m.Name, m => m.Name),
+				Members = enumType
+					.GetMembers()
+					.Where(m => m.Kind == SymbolKind.Field)
+					.Select(m =>
+					{
+						EnumMemberDeclarationSyntax? enumMemberDeclarationSyntax = m.DeclaringSyntaxReferences.Length == 0 ? null : m.DeclaringSyntaxReferences[0].GetSyntax() as EnumMemberDeclarationSyntax;
+						string? explicitValue = enumMemberDeclarationSyntax?.GetExplicitValue();
+
+						return new EnumMemberModel
+						{
+							ExplicitValue = explicitValue,
+							Name = m.Name,
+							DisplayName = m.Name,
+						};
+					})
+					.ToList(),
 				HasFlagsAttribute = enumType.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
 			});
 		}

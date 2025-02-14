@@ -19,13 +19,19 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 		};
 	}
 
-	private Dictionary<string, string> GetMemberNames()
+	private List<EnumMemberModel> GetMemberNames()
 	{
-		Dictionary<string, string> memberNames = [];
+		List<EnumMemberModel> memberNames = [];
 		foreach (EnumMemberDeclarationSyntax member in enumDeclarationSyntax.Members)
 		{
-			string memberName = member.GetAttributeArgumentValue<string>(semanticModel, "System.ComponentModel.DataAnnotations.DisplayAttribute", "Name") ?? member.Identifier.Text;
-			memberNames.Add(member.Identifier.Text, memberName);
+			string displayName = member.GetAttributeArgumentValue<string>(semanticModel, "System.ComponentModel.DataAnnotations.DisplayAttribute", "Name") ?? member.Identifier.Text;
+
+			memberNames.Add(new EnumMemberModel
+			{
+				Name = member.Identifier.Text,
+				DisplayName = displayName,
+				ExplicitValue = member.GetExplicitValue(),
+			});
 		}
 
 		return memberNames;

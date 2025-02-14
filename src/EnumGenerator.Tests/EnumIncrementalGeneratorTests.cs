@@ -141,4 +141,89 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task EnumWithDuplicateMembers()
+	{
+		const string code =
+			"""
+			using EnumGenerator;
+			namespace Tests;
+			[GenerateEnumUtilities]
+			public enum BlendEquationModeEXT
+			{
+				FuncAdd = 0x8006,
+				FuncAddExt = 0x8006,
+				Min = 0x8007,
+				MinExt = 0x8007,
+				Max = 0x8008,
+				MaxExt = 0x8008,
+				FuncSubtract = 0x800A,
+				FuncSubtractExt = 0x800A,
+				FuncReverseSubtract = 0x800B,
+				FuncReverseSubtractExt = 0x800B,
+				AlphaMinSgix = 0x8320,
+				AlphaMaxSgix = 0x8321,
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
+	[Fact]
+	public async Task ExternalEnumWithDuplicateMembers()
+	{
+		const string code =
+			"""
+			using EnumGenerator;
+			using Tests;
+			[assembly: GenerateEnumUtilities<BlendEquationModeEXT>]
+			namespace Tests;
+			public enum BlendEquationModeEXT
+			{
+				FuncAdd = 0x8006,
+				FuncAddExt = 0x8006,
+				Min = 0x8007,
+				MinExt = 0x8007,
+				Max = 0x8008,
+				MaxExt = 0x8008,
+				FuncSubtract = 0x800A,
+				FuncSubtractExt = 0x800A,
+				FuncReverseSubtract = 0x800B,
+				FuncReverseSubtractExt = 0x800B,
+				AlphaMinSgix = 0x8320,
+				AlphaMaxSgix = 0x8321,
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
+	[Theory]
+	[InlineData("byte")]
+	[InlineData("sbyte")]
+	[InlineData("short")]
+	[InlineData("ushort")]
+	[InlineData("int")]
+	[InlineData("uint")]
+	[InlineData("long")]
+	[InlineData("ulong")]
+	public async Task EnumWithDuplicateMembersFormattedDifferently(string underlyingType)
+	{
+		string code =
+			$$"""
+			  using EnumGenerator;
+			  namespace Tests;
+			  [GenerateEnumUtilities]
+			  public enum TestEnum : {{underlyingType}}
+			  {
+			  	Member0 = 0,
+			  	Member0Ext = 0x00,
+			  	Member1 = 1,
+			  	Member1Ext = 0x01,
+			  }
+			  """;
+
+		await TestHelper.Verify(code, underlyingType);
+	}
 }

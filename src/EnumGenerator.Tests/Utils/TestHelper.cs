@@ -13,7 +13,7 @@ internal static class TestHelper
 		generalDiagnosticOption: ReportDiagnostic.Warn,
 		nullableContextOptions: NullableContextOptions.Enable);
 
-	public static Task Verify(string source)
+	public static Task Verify(string source, params string[] args)
 	{
 		Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 		Assembly netstandard = assemblies.Single(a => a.GetName().Name == "netstandard");
@@ -41,6 +41,10 @@ internal static class TestHelper
 		if (diagnostics.Length > 0)
 			return Task.FromException(new InvalidOperationException($"Post-generator compilation failed ({diagnostics.Length} errors):\n{string.Join(Environment.NewLine, diagnostics)}"));
 
-		return Verifier.Verify(driver).UseDirectory(Path.Combine("..", "snapshots"));
+		SettingsTask settingsTask = Verifier.Verify(driver).UseDirectory(Path.Combine("..", "snapshots"));
+		if (args.Length > 0)
+			settingsTask = settingsTask.UseParameters(args);
+
+		return settingsTask;
 	}
 }

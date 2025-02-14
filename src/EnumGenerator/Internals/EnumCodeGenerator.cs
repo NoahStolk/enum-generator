@@ -15,6 +15,15 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 
 	public string Generate()
 	{
+		List<EnumMemberModel> relevantMembers = [];
+		foreach (EnumMemberModel member in enumModel.Members)
+		{
+			if (member.ExplicitValue != null && relevantMembers.Any(m => m.ExplicitValue == member.ExplicitValue))
+				continue;
+
+			relevantMembers.Add(member);
+		}
+
 		CodeWriter writer = new();
 		AddUsingIfNeeded(writer, "System");
 		AddUsingIfNeeded(writer, "System.Collections.Generic");
@@ -27,8 +36,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (KeyValuePair<string, string> kvp in enumModel.Members)
-			writer.WriteLine($"{enumModel.EnumName}.{kvp.Key} => \"{kvp.Value}\",");
+		foreach (EnumMemberModel member in relevantMembers)
+			writer.WriteLine($"{enumModel.EnumName}.{member.Name} => \"{member.DisplayName}\",");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
@@ -37,8 +46,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (KeyValuePair<string, string> kvp in enumModel.Members)
-			writer.WriteLine($"{enumModel.EnumName}.{kvp.Key} => \"{kvp.Value}\"u8,");
+		foreach (EnumMemberModel member in relevantMembers)
+			writer.WriteLine($"{enumModel.EnumName}.{member.Name} => \"{member.DisplayName}\"u8,");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
@@ -59,7 +68,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumName}}>();""");
 		writer.WriteLine();
-		string nullTerminatedMemberNames = string.Concat(enumModel.Members.Select(kvp => $"{kvp.Value}\\0"));
+		string nullTerminatedMemberNames = string.Concat(relevantMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
 		writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
 		writer.EndBlock();
 

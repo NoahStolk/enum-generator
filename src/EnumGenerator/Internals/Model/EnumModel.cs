@@ -8,7 +8,7 @@ internal sealed record EnumModel
 
 	public required string Accessibility { get; init; }
 
-	public required Dictionary<string, string> Members { get; init; }
+	public required List<EnumMemberModel> Members { get; init; }
 
 	public required bool HasFlagsAttribute { get; init; }
 }
