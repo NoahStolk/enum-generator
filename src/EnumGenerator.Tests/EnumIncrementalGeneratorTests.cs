@@ -199,6 +199,122 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
+	[Fact]
+	public async Task EnumWithDuplicateMembersAndAttributes()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+
+			namespace Silk.NET.OpenGL;
+
+			[GenerateEnumUtilities]
+			[NativeName("Name", "BlendEquationModeEXT")]
+			public enum BlendEquationModeEXT : int
+			{
+			    [NativeName("Name", "GL_FUNC_ADD")]
+			    FuncAdd = 0x8006,
+			    [NativeName("Name", "GL_FUNC_ADD_EXT")]
+			    FuncAddExt = 0x8006,
+			    [NativeName("Name", "GL_MIN")]
+			    Min = 0x8007,
+			    [NativeName("Name", "GL_MIN_EXT")]
+			    MinExt = 0x8007,
+			    [NativeName("Name", "GL_MAX")]
+			    Max = 0x8008,
+			    [NativeName("Name", "GL_MAX_EXT")]
+			    MaxExt = 0x8008,
+			    [NativeName("Name", "GL_FUNC_SUBTRACT")]
+			    FuncSubtract = 0x800A,
+			    [NativeName("Name", "GL_FUNC_SUBTRACT_EXT")]
+			    FuncSubtractExt = 0x800A,
+			    [NativeName("Name", "GL_FUNC_REVERSE_SUBTRACT")]
+			    FuncReverseSubtract = 0x800B,
+			    [NativeName("Name", "GL_FUNC_REVERSE_SUBTRACT_EXT")]
+			    FuncReverseSubtractExt = 0x800B,
+			    [NativeName("Name", "GL_ALPHA_MIN_SGIX")]
+			    AlphaMinSgix = 0x8320,
+			    [NativeName("Name", "GL_ALPHA_MAX_SGIX")]
+			    AlphaMaxSgix = 0x8321,
+			}
+
+			[AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+			public class NativeNameAttribute : Attribute
+			{
+			    public NativeNameAttribute(string category, string name)
+			    {
+			        Category = category;
+			        Name = name;
+			    }
+
+			    public string Category { get; }
+			    public string Name { get; }
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
+	[Fact]
+	public async Task ExternalEnumWithDuplicateMembersAndAttributes()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			using Silk.NET.OpenGL;
+
+			[assembly: GenerateEnumUtilities<BlendEquationModeEXT>]
+
+			namespace Silk.NET.OpenGL;
+
+			[NativeName("Name", "BlendEquationModeEXT")]
+			public enum BlendEquationModeEXT : int
+			{
+			    [NativeName("Name", "GL_FUNC_ADD")]
+			    FuncAdd = 0x8006,
+			    [NativeName("Name", "GL_FUNC_ADD_EXT")]
+			    FuncAddExt = 0x8006,
+			    [NativeName("Name", "GL_MIN")]
+			    Min = 0x8007,
+			    [NativeName("Name", "GL_MIN_EXT")]
+			    MinExt = 0x8007,
+			    [NativeName("Name", "GL_MAX")]
+			    Max = 0x8008,
+			    [NativeName("Name", "GL_MAX_EXT")]
+			    MaxExt = 0x8008,
+			    [NativeName("Name", "GL_FUNC_SUBTRACT")]
+			    FuncSubtract = 0x800A,
+			    [NativeName("Name", "GL_FUNC_SUBTRACT_EXT")]
+			    FuncSubtractExt = 0x800A,
+			    [NativeName("Name", "GL_FUNC_REVERSE_SUBTRACT")]
+			    FuncReverseSubtract = 0x800B,
+			    [NativeName("Name", "GL_FUNC_REVERSE_SUBTRACT_EXT")]
+			    FuncReverseSubtractExt = 0x800B,
+			    [NativeName("Name", "GL_ALPHA_MIN_SGIX")]
+			    AlphaMinSgix = 0x8320,
+			    [NativeName("Name", "GL_ALPHA_MAX_SGIX")]
+			    AlphaMaxSgix = 0x8321,
+			}
+
+			[AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+			public class NativeNameAttribute : Attribute
+			{
+			    public NativeNameAttribute(string category, string name)
+			    {
+			        Category = category;
+			        Name = name;
+			    }
+
+			    public string Category { get; }
+			    public string Name { get; }
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
 	[Theory]
 	[InlineData("byte")]
 	[InlineData("sbyte")]
