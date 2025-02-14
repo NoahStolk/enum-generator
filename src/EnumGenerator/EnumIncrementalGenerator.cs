@@ -17,14 +17,18 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
 		// ! LINQ is used to filter out null values.
-		IncrementalValuesProvider<EnumModel> unionModelProvider = context.SyntaxProvider
+		IncrementalValuesProvider<EnumModel> enumModelProvider = context.SyntaxProvider
 			.CreateSyntaxProvider(
 				(sn, _) => sn is EnumDeclarationSyntax,
 				(ctx, _) => GetEnumModel(ctx))
-			.Where(um => um != null)
-			.Select((um, _) => um!);
+			.Where(em => em != null)
+			.Select((em, _) => em!);
 
-		context.RegisterSourceOutput(unionModelProvider.Collect(), GenerateEnumUtilities);
+		IncrementalValuesProvider<EnumModel> attributeEnumModelProvider = context.CompilationProvider
+			.SelectMany((compilation, _) => GetEnumModelsFromAttributes(compilation));
+
+		context.RegisterSourceOutput(attributeEnumModelProvider.Collect(), GenerateEnumUtilities);
+		context.RegisterSourceOutput(enumModelProvider.Collect(), GenerateEnumUtilities);
 	}
 
 	private static EnumModel? GetEnumModel(GeneratorSyntaxContext context)
@@ -38,6 +42,32 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 
 		EnumModelBuilder builder = new(context.SemanticModel, enumDeclarationSyntax, enumSymbol);
 		return builder.Build();
+	}
+
+	private static List<EnumModel> GetEnumModelsFromAttributes(Compilation compilation)
+	{
+		List<EnumModel> enumModels = [];
+
+		foreach (AttributeData? attribute in compilation.Assembly.GetAttributes())
+		{
+			if (attribute.AttributeClass is not { Name: "GenerateEnumUtilitiesAttribute", IsGenericType: true })
+				continue;
+
+			ITypeSymbol enumType = attribute.AttributeClass.TypeArguments[0];
+			if (enumType.TypeKind != TypeKind.Enum)
+				continue;
+
+			enumModels.Add(new EnumModel
+			{
+				EnumName = enumType.Name,
+				NamespaceName = enumType.ContainingNamespace.ToDisplayString(),
+				Accessibility = "public",
+				Members = enumType.GetMembers().Where(m => m.Kind == SymbolKind.Field).ToDictionary(m => m.Name, m => m.Name),
+				HasFlagsAttribute = enumType.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
+			});
+		}
+
+		return enumModels;
 	}
 
 	private static void GenerateEnumUtilities(SourceProductionContext context, ImmutableArray<EnumModel> enumModels)

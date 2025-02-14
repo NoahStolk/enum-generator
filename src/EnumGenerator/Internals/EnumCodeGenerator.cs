@@ -5,11 +5,19 @@ namespace EnumGenerator.Internals;
 
 internal sealed class EnumCodeGenerator(EnumModel enumModel)
 {
+	private void AddUsingIfNeeded(CodeWriter writer, string usingNamespace)
+	{
+		if (enumModel.NamespaceName == usingNamespace)
+			return;
+
+		writer.WriteLine($"using {usingNamespace};");
+	}
+
 	public string Generate()
 	{
 		CodeWriter writer = new();
-		writer.WriteLine("using System;");
-		writer.WriteLine("using System.Collections.Generic;");
+		AddUsingIfNeeded(writer, "System");
+		AddUsingIfNeeded(writer, "System.Collections.Generic");
 		writer.WriteLine();
 		writer.WriteLine($"namespace {enumModel.NamespaceName};");
 		writer.WriteLine();

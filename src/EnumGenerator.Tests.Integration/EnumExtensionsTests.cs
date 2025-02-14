@@ -16,6 +16,9 @@ public sealed class EnumExtensionsTests
 
 		Assert.Equal("C#", Language.CSharp.ToStringFast());
 		Assert.Equal("C++", Language.CPlusPlus.ToStringFast());
+
+		Assert.Equal("Sunday", DayOfWeek.Sunday.ToStringFast());
+		Assert.Equal("Unspecified", DateTimeKind.Unspecified.ToStringFast());
 	}
 
 	[Fact]
@@ -28,6 +31,9 @@ public sealed class EnumExtensionsTests
 
 		Assert.True("C#"u8.SequenceEqual(Language.CSharp.AsUtf8Span()));
 		Assert.True("C++"u8.SequenceEqual(Language.CPlusPlus.AsUtf8Span()));
+
+		Assert.True("Sunday"u8.SequenceEqual(DayOfWeek.Sunday.AsUtf8Span()));
+		Assert.True("Unspecified"u8.SequenceEqual(DateTimeKind.Unspecified.AsUtf8Span()));
 	}
 
 	[Fact]

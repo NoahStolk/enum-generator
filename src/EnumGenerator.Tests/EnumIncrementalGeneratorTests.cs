@@ -114,4 +114,31 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task ExternalEnum()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			[assembly: GenerateEnumUtilities<DayOfWeek>]
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
+	[Fact]
+	public async Task ExternalEnums()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			[assembly: GenerateEnumUtilities<DayOfWeek>]
+			[assembly: GenerateEnumUtilities<DateTimeKind>]
+			""";
+
+		await TestHelper.Verify(code);
+	}
 }

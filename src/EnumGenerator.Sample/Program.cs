@@ -1,5 +1,8 @@
-﻿using EnumGenerator.Sample.Enums;
+﻿using EnumGenerator;
+using EnumGenerator.Sample.Enums;
 using System.Text;
+
+[assembly: GenerateEnumUtilities<DayOfWeek>]
 
 Console.WriteLine(IntegerType.Byte.ToStringFast());
 Console.WriteLine(IntegerType.Short.ToStringFast());
@@ -23,6 +26,9 @@ Console.WriteLine();
 
 Console.WriteLine(Language.CSharp.ToStringFast());
 Console.WriteLine(Language.CPlusPlus.ToStringFast());
+Console.WriteLine();
+
+Console.WriteLine(DayOfWeek.Sunday.ToStringFast());
 
 static string SpanToString(ReadOnlySpan<byte> utf8)
 {
