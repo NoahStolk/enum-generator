@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-public static class TestEnumExtensions
+public static partial class TestEnumExtensions
 {
 	public static string ToStringFast(this TestEnum value)
 	{
@@ -41,7 +41,7 @@ public static class TestEnumExtensions
 	}
 }
 
-public static class TestEnumUtils
+public static partial class TestEnumUtils
 {
 	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
 

@@ -13,7 +13,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine();
 		writer.WriteLine($"namespace {enumModel.NamespaceName};");
 		writer.WriteLine();
-		writer.WriteLine($"{enumModel.Accessibility} static class {enumModel.EnumName}Extensions");
+		writer.WriteLine($"{enumModel.Accessibility} static partial class {enumModel.EnumName}Extensions");
 		writer.StartBlock();
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumName} value)");
 		writer.StartBlock();
@@ -47,7 +47,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlock();
 
 		writer.WriteLine();
-		writer.WriteLine($"{enumModel.Accessibility} static class {enumModel.EnumName}Utils");
+		writer.WriteLine($"{enumModel.Accessibility} static partial class {enumModel.EnumName}Utils");
 		writer.StartBlock();
 		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumName}}>();""");
 		writer.WriteLine();
