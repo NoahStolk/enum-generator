@@ -15,7 +15,7 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 			NamespaceName = enumSymbol.ContainingNamespace.ToDisplayString(),
 			Accessibility = enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
 			Members = GetMemberNames(),
-			HasFlagsAttribute = semanticModel.HasAttribute(enumDeclarationSyntax, "System.FlagsAttribute"),
+			HasFlagsAttribute = enumDeclarationSyntax.HasAttribute(semanticModel, "System.FlagsAttribute"),
 		};
 	}
 
@@ -23,7 +23,10 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 	{
 		Dictionary<string, string> memberNames = [];
 		foreach (EnumMemberDeclarationSyntax member in enumDeclarationSyntax.Members)
-			memberNames.Add(member.Identifier.Text, member.Identifier.Text); // TODO: Use DisplayAttribute if available.
+		{
+			string memberName = member.GetAttributeArgumentValue<string>(semanticModel, "System.ComponentModel.DataAnnotations.DisplayAttribute", "Name") ?? member.Identifier.Text;
+			memberNames.Add(member.Identifier.Text, memberName);
+		}
 
 		return memberNames;
 	}

@@ -1,4 +1,5 @@
-﻿using EnumGenerator.Tests.Integration.Enums;
+﻿using EnumGenerator.Sample.Enums;
+using EnumGenerator.Tests.Integration.Enums;
 using Xunit;
 
 namespace EnumGenerator.Tests.Integration;
@@ -12,6 +13,9 @@ public sealed class EnumExtensionsTests
 		Assert.Equal("Short", IntegerType.Short.ToStringFast());
 		Assert.Equal("Int", IntegerType.Int.ToStringFast());
 		Assert.Equal("Long", IntegerType.Long.ToStringFast());
+
+		Assert.Equal("C#", Language.CSharp.ToStringFast());
+		Assert.Equal("C++", Language.CPlusPlus.ToStringFast());
 	}
 
 	[Fact]
@@ -21,6 +25,9 @@ public sealed class EnumExtensionsTests
 		Assert.True("Short"u8.SequenceEqual(IntegerType.Short.AsUtf8Span()));
 		Assert.True("Int"u8.SequenceEqual(IntegerType.Int.AsUtf8Span()));
 		Assert.True("Long"u8.SequenceEqual(IntegerType.Long.AsUtf8Span()));
+
+		Assert.True("C#"u8.SequenceEqual(Language.CSharp.AsUtf8Span()));
+		Assert.True("C++"u8.SequenceEqual(Language.CPlusPlus.AsUtf8Span()));
 	}
 
 	[Fact]

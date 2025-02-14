@@ -93,4 +93,25 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task EnumMembersWithDisplayAttributes()
+	{
+		const string code =
+			"""
+			using System.ComponentModel.DataAnnotations;
+			using EnumGenerator;
+			namespace Tests;
+			[GenerateEnumUtilities]
+			internal enum TestEnum
+			{
+				[Display(Name = "C#")]
+				CSharp,
+				[Display(Name = "C++")]
+				CPlusPlus,
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
 }

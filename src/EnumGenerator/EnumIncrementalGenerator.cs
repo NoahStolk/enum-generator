@@ -33,7 +33,7 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 		if (context.SemanticModel.GetDeclaredSymbol(enumDeclarationSyntax) is not INamedTypeSymbol enumSymbol)
 			return null;
 
-		if (!context.SemanticModel.HasAttribute(enumDeclarationSyntax, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}"))
+		if (!enumDeclarationSyntax.HasAttribute(context.SemanticModel, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}"))
 			return null;
 
 		EnumModelBuilder builder = new(context.SemanticModel, enumDeclarationSyntax, enumSymbol);

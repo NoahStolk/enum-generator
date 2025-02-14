@@ -21,6 +21,9 @@ Console.WriteLine(ab.HasFlagFast(FlagsType.D));
 Console.WriteLine(ab.HasFlagFast(FlagsType.E));
 Console.WriteLine();
 
+Console.WriteLine(Language.CSharp.ToStringFast());
+Console.WriteLine(Language.CPlusPlus.ToStringFast());
+
 static string SpanToString(ReadOnlySpan<byte> utf8)
 {
 	return Encoding.UTF8.GetString(utf8);
