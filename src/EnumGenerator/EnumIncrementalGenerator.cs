@@ -67,12 +67,10 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 					.Where(m => m.Kind == SymbolKind.Field)
 					.Select(m =>
 					{
-						EnumMemberDeclarationSyntax? enumMemberDeclarationSyntax = m.DeclaringSyntaxReferences.Length == 0 ? null : m.DeclaringSyntaxReferences[0].GetSyntax() as EnumMemberDeclarationSyntax;
-						string? explicitValue = enumMemberDeclarationSyntax?.GetExplicitValue();
-
+						IFieldSymbol fieldSymbol = (IFieldSymbol)m;
 						return new EnumMemberModel
 						{
-							ExplicitValue = explicitValue,
+							ConstantValue = fieldSymbol.ConstantValue?.ToString(),
 							Name = m.Name,
 							DisplayName = m.Name,
 						};

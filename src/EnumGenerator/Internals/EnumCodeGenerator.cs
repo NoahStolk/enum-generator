@@ -18,7 +18,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		List<EnumMemberModel> relevantMembers = [];
 		foreach (EnumMemberModel member in enumModel.Members)
 		{
-			if (member.ExplicitValue != null && relevantMembers.Any(m => m.ExplicitValue == member.ExplicitValue))
+			if (member.ConstantValue != null && relevantMembers.Any(m => m.ConstantValue == member.ConstantValue))
 				continue;
 
 			relevantMembers.Add(member);

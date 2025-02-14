@@ -30,7 +30,7 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 			{
 				Name = member.Identifier.Text,
 				DisplayName = displayName,
-				ExplicitValue = member.GetExplicitValue(),
+				ConstantValue = member.GetConstantValue(),
 			});
 		}
 

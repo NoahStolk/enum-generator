@@ -2,7 +2,7 @@
 
 internal sealed record EnumMemberModel
 {
-	public required string? ExplicitValue { get; init; }
+	public required string? ConstantValue { get; init; }
 
 	public required string Name { get; init; }
 
