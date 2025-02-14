@@ -4,70 +4,54 @@ namespace EnumGenerator.Tests;
 
 public sealed class EnumIncrementalGeneratorTests
 {
-	[Fact]
-	public async Task Enum()
+	[Theory]
+	[InlineData("internal", "int")]
+	[InlineData("internal", "byte")]
+	[InlineData("public", "int")]
+	public async Task Enum(string accessibility, string underlyingType)
 	{
-		const string code =
-			"""
-			using EnumGenerator;
-			namespace Tests;
-			[GenerateEnumUtilities]
-			internal enum TestEnum
-			{
-				None,
-				First,
-				Second,
-				Third,
-				Fourth,
-				Fifth,
-			}
-			""";
+		string code =
+			$$"""
+			  using EnumGenerator;
+			  namespace Tests;
+			  [GenerateEnumUtilities]
+			  {{accessibility}} enum TestEnum : {{underlyingType}}
+			  {
+			  	None,
+			  	First,
+			  	Second,
+			  	Third,
+			  	Fourth,
+			  	Fifth,
+			  }
+			  """;
 
-		await TestHelper.Verify(code);
+		await TestHelper.Verify(code, accessibility, underlyingType);
 	}
 
-	[Fact]
-	public async Task PublicEnum()
+	[Theory]
+	[InlineData("internal", "int")]
+	[InlineData("internal", "byte")]
+	[InlineData("public", "int")]
+	public async Task EnumWithCustomGeneratedClassName(string accessibility, string underlyingType)
 	{
-		const string code =
-			"""
-			using EnumGenerator;
-			namespace Tests;
-			[GenerateEnumUtilities]
-			public enum TestEnum
-			{
-				None,
-				First,
-				Second,
-				Third,
-				Fourth,
-				Fifth,
-			}
-			""";
+		string code =
+			$$"""
+			  using EnumGenerator;
+			  namespace Tests;
+			  [GenerateEnumUtilities(GeneratedClassName = "TestEnumUtilities")]
+			  {{accessibility}} enum TestEnum : {{underlyingType}}
+			  {
+			  	None,
+			  	First,
+			  	Second,
+			  	Third,
+			  	Fourth,
+			  	Fifth,
+			  }
+			  """;
 
-		await TestHelper.Verify(code);
-	}
-
-	[Fact]
-	public async Task EnumWithByteUnderlyingType()
-	{
-		const string code =
-			"""
-			using EnumGenerator;
-			namespace Tests;
-			[GenerateEnumUtilities]
-			internal enum TestEnum : byte
-			{
-				None,
-				First,
-				Second,
-				Third,
-				Fourth,
-				Fifth,
-			}
-			""";
-
-		await TestHelper.Verify(code);
+		await TestHelper.Verify(code, accessibility, underlyingType);
 	}
 
 	[Fact]
@@ -123,6 +107,19 @@ public sealed class EnumIncrementalGeneratorTests
 			using System;
 			using EnumGenerator;
 			[assembly: GenerateEnumUtilities<DayOfWeek>]
+			""";
+
+		await TestHelper.Verify(code);
+	}
+
+	[Fact]
+	public async Task ExternalEnumWithCustomGeneratedClassName()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			[assembly: GenerateEnumUtilities<DayOfWeek>(GeneratedClassName = "DayOfWeekGeneratedUtilities")]
 			""";
 
 		await TestHelper.Verify(code);
@@ -341,5 +338,21 @@ public sealed class EnumIncrementalGeneratorTests
 			  """;
 
 		await TestHelper.Verify(code, underlyingType);
+	}
+
+	[Fact]
+	public async Task EmptyEnum()
+	{
+		const string code =
+			"""
+			using EnumGenerator;
+			namespace Tests;
+			[GenerateEnumUtilities]
+			internal enum TestEnum
+			{
+			}
+			""";
+
+		await TestHelper.Verify(code);
 	}
 }

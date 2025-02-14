@@ -10,8 +10,12 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-public static partial class BlendEquationModeEXTExtensions
+public static class BlendEquationModeEXTUtils
 {
+	public static IReadOnlyList<BlendEquationModeEXT> Values { get; } = Enum.GetValues<BlendEquationModeEXT>();
+
+	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
+
 	public static string ToStringFast(this BlendEquationModeEXT value)
 	{
 		return value switch
@@ -41,11 +45,4 @@ public static partial class BlendEquationModeEXTExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
-}
-
-public static partial class BlendEquationModeEXTUtils
-{
-	public static IReadOnlyList<BlendEquationModeEXT> Values { get; } = Enum.GetValues<BlendEquationModeEXT>();
-
-	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
 }

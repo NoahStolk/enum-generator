@@ -57,6 +57,8 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 			if (enumType.TypeKind != TypeKind.Enum)
 				continue;
 
+			string? generatedClassName = attribute.NamedArguments.FirstOrDefault(kvp => kvp.Key == "GeneratedClassName").Value.Value?.ToString();
+
 			enumModels.Add(new EnumModel
 			{
 				EnumName = enumType.Name,
@@ -77,6 +79,7 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 					})
 					.ToList(),
 				HasFlagsAttribute = enumType.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
+				GeneratedClassName = generatedClassName,
 			});
 		}
 

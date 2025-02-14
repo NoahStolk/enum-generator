@@ -13,6 +13,16 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine($"using {usingNamespace};");
 	}
 
+	private string GetClassName()
+	{
+		// TODO: Maybe also check if the class name is a valid C# identifier.
+		if (string.IsNullOrWhiteSpace(enumModel.GeneratedClassName))
+			return $"{enumModel.EnumName}Utils";
+
+		// ! IsNullOrWhiteSpace is not annotated in .NET Standard 2.0.
+		return enumModel.GeneratedClassName!;
+	}
+
 	public string Generate()
 	{
 		List<EnumMemberModel> relevantMembers = [];
@@ -30,8 +40,19 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine();
 		writer.WriteLine($"namespace {enumModel.NamespaceName};");
 		writer.WriteLine();
-		writer.WriteLine($"{enumModel.Accessibility} static partial class {enumModel.EnumName}Extensions");
+		writer.WriteLine($"{enumModel.Accessibility} static class {GetClassName()}");
 		writer.StartBlock();
+
+		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumName}}>();""");
+		writer.WriteLine();
+
+		if (relevantMembers.Count > 0)
+		{
+			string nullTerminatedMemberNames = string.Concat(relevantMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
+			writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
+			writer.WriteLine();
+		}
+
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
@@ -61,15 +82,6 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 			writer.EndBlock();
 		}
 
-		writer.EndBlock();
-
-		writer.WriteLine();
-		writer.WriteLine($"{enumModel.Accessibility} static partial class {enumModel.EnumName}Utils");
-		writer.StartBlock();
-		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumName}}>();""");
-		writer.WriteLine();
-		string nullTerminatedMemberNames = string.Concat(relevantMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
-		writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
 		writer.EndBlock();
 
 		return writer.ToString();

@@ -11,4 +11,6 @@ internal sealed record EnumModel
 	public required List<EnumMemberModel> Members { get; init; }
 
 	public required bool HasFlagsAttribute { get; init; }
+
+	public required string? GeneratedClassName { get; init; }
 }

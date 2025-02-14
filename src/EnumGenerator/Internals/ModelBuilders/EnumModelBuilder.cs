@@ -1,5 +1,6 @@
 ﻿using EnumGenerator.Internals.Extensions;
 using EnumGenerator.Internals.Model;
+using EnumGenerator.Internals.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -16,6 +17,7 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 			Accessibility = enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
 			Members = GetMemberNames(),
 			HasFlagsAttribute = enumDeclarationSyntax.HasAttribute(semanticModel, "System.FlagsAttribute"),
+			GeneratedClassName = enumDeclarationSyntax.GetAttributeArgumentValue<string>(semanticModel, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}", "GeneratedClassName"),
 		};
 	}
 

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-internal static class TestEnumUtils
+internal static class TestEnumUtilities
 {
 	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
 
@@ -42,10 +42,5 @@ internal static class TestEnumUtils
 			TestEnum.Fifth => "Fifth"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
-	}
-
-	public static bool HasFlagFast(this TestEnum value, TestEnum flag)
-	{
-		return (value & flag) != 0;
 	}
 }

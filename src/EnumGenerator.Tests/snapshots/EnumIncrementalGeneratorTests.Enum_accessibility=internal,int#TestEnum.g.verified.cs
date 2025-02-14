@@ -43,9 +43,4 @@ internal static class TestEnumUtils
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
-
-	public static bool HasFlagFast(this TestEnum value, TestEnum flag)
-	{
-		return (value & flag) != 0;
-	}
 }

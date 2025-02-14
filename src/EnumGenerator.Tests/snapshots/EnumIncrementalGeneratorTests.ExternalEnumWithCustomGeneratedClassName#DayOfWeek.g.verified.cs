@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace System;
 
-public static class DayOfWeekUtils
+public static class DayOfWeekGeneratedUtilities
 {
 	public static IReadOnlyList<DayOfWeek> Values { get; } = Enum.GetValues<DayOfWeek>();
 

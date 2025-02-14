@@ -14,18 +14,10 @@ internal static class TestEnumUtils
 {
 	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
 
-	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "None\0First\0Second\0Third\0Fourth\0Fifth\0"u8;
-
 	public static string ToStringFast(this TestEnum value)
 	{
 		return value switch
 		{
-			TestEnum.None => "None",
-			TestEnum.First => "First",
-			TestEnum.Second => "Second",
-			TestEnum.Third => "Third",
-			TestEnum.Fourth => "Fourth",
-			TestEnum.Fifth => "Fifth",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
@@ -34,18 +26,7 @@ internal static class TestEnumUtils
 	{
 		return value switch
 		{
-			TestEnum.None => "None"u8,
-			TestEnum.First => "First"u8,
-			TestEnum.Second => "Second"u8,
-			TestEnum.Third => "Third"u8,
-			TestEnum.Fourth => "Fourth"u8,
-			TestEnum.Fifth => "Fifth"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
-	}
-
-	public static bool HasFlagFast(this TestEnum value, TestEnum flag)
-	{
-		return (value & flag) != 0;
 	}
 }

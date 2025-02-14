@@ -10,8 +10,12 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-internal static partial class TestEnumExtensions
+internal static class TestEnumUtils
 {
+	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
+
+	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "C#\0C++\0"u8;
+
 	public static string ToStringFast(this TestEnum value)
 	{
 		return value switch
@@ -31,11 +35,4 @@ internal static partial class TestEnumExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
-}
-
-internal static partial class TestEnumUtils
-{
-	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
-
-	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "C#\0C++\0"u8;
 }

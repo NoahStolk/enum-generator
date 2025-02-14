@@ -9,8 +9,12 @@ using System.Collections.Generic;
 
 namespace System;
 
-public static partial class DateTimeKindExtensions
+public static class DateTimeKindUtils
 {
+	public static IReadOnlyList<DateTimeKind> Values { get; } = Enum.GetValues<DateTimeKind>();
+
+	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Unspecified\0Utc\0Local\0"u8;
+
 	public static string ToStringFast(this DateTimeKind value)
 	{
 		return value switch
@@ -32,11 +36,4 @@ public static partial class DateTimeKindExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
-}
-
-public static partial class DateTimeKindUtils
-{
-	public static IReadOnlyList<DateTimeKind> Values { get; } = Enum.GetValues<DateTimeKind>();
-
-	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Unspecified\0Utc\0Local\0"u8;
 }
