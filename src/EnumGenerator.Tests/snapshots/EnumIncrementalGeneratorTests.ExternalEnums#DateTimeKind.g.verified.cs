@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace System;
 
-public static class DateTimeKindUtils
+public static class DateTimeKindGen
 {
 	public static IReadOnlyList<System.DateTimeKind> Values { get; } = Enum.GetValues<System.DateTimeKind>();
 

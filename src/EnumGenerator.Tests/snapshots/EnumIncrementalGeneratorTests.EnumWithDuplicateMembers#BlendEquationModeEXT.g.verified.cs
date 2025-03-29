@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-public static class BlendEquationModeEXTUtils
+public static class BlendEquationModeEXTGen
 {
 	public static IReadOnlyList<Tests.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Tests.BlendEquationModeEXT>();
 

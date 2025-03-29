@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Silk.NET.OpenGL;
 
-public static class BlendEquationModeEXTUtils
+public static class BlendEquationModeEXTGen
 {
 	public static IReadOnlyList<Silk.NET.OpenGL.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Silk.NET.OpenGL.BlendEquationModeEXT>();
 

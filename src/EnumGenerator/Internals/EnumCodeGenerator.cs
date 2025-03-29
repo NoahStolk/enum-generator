@@ -17,7 +17,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 	{
 		// TODO: Maybe also check if GeneratedClassName is a valid C# identifier.
 		if (string.IsNullOrWhiteSpace(enumModel.GeneratedClassName))
-			return $"{enumModel.EnumName}Utils";
+			return $"{enumModel.EnumName}Gen";
 
 		// ! IsNullOrWhiteSpace is not annotated in .NET Standard 2.0.
 		return enumModel.GeneratedClassName!;

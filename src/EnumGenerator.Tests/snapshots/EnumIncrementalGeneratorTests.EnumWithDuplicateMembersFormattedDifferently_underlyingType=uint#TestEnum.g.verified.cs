@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Tests;
 
-public static class TestEnumUtils
+public static class TestEnumGen
 {
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
