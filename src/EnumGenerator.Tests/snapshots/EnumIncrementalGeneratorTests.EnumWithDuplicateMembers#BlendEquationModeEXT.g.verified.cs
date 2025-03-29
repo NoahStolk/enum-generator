@@ -12,36 +12,36 @@ namespace Tests;
 
 public static class BlendEquationModeEXTUtils
 {
-	public static IReadOnlyList<BlendEquationModeEXT> Values { get; } = Enum.GetValues<BlendEquationModeEXT>();
+	public static IReadOnlyList<Tests.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Tests.BlendEquationModeEXT>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
 
-	public static string ToStringFast(this BlendEquationModeEXT value)
+	public static string ToStringFast(this Tests.BlendEquationModeEXT value)
 	{
 		return value switch
 		{
-			BlendEquationModeEXT.FuncAdd => "FuncAdd",
-			BlendEquationModeEXT.Min => "Min",
-			BlendEquationModeEXT.Max => "Max",
-			BlendEquationModeEXT.FuncSubtract => "FuncSubtract",
-			BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract",
-			BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix",
-			BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix",
+			Tests.BlendEquationModeEXT.FuncAdd => "FuncAdd",
+			Tests.BlendEquationModeEXT.Min => "Min",
+			Tests.BlendEquationModeEXT.Max => "Max",
+			Tests.BlendEquationModeEXT.FuncSubtract => "FuncSubtract",
+			Tests.BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract",
+			Tests.BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix",
+			Tests.BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this BlendEquationModeEXT value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.BlendEquationModeEXT value)
 	{
 		return value switch
 		{
-			BlendEquationModeEXT.FuncAdd => "FuncAdd"u8,
-			BlendEquationModeEXT.Min => "Min"u8,
-			BlendEquationModeEXT.Max => "Max"u8,
-			BlendEquationModeEXT.FuncSubtract => "FuncSubtract"u8,
-			BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract"u8,
-			BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix"u8,
-			BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix"u8,
+			Tests.BlendEquationModeEXT.FuncAdd => "FuncAdd"u8,
+			Tests.BlendEquationModeEXT.Min => "Min"u8,
+			Tests.BlendEquationModeEXT.Max => "Max"u8,
+			Tests.BlendEquationModeEXT.FuncSubtract => "FuncSubtract"u8,
+			Tests.BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract"u8,
+			Tests.BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix"u8,
+			Tests.BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}

@@ -12,36 +12,36 @@ namespace Silk.NET.OpenGL;
 
 public static class BlendEquationModeEXTUtils
 {
-	public static IReadOnlyList<BlendEquationModeEXT> Values { get; } = Enum.GetValues<BlendEquationModeEXT>();
+	public static IReadOnlyList<Silk.NET.OpenGL.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Silk.NET.OpenGL.BlendEquationModeEXT>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
 
-	public static string ToStringFast(this BlendEquationModeEXT value)
+	public static string ToStringFast(this Silk.NET.OpenGL.BlendEquationModeEXT value)
 	{
 		return value switch
 		{
-			BlendEquationModeEXT.FuncAdd => "FuncAdd",
-			BlendEquationModeEXT.Min => "Min",
-			BlendEquationModeEXT.Max => "Max",
-			BlendEquationModeEXT.FuncSubtract => "FuncSubtract",
-			BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract",
-			BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix",
-			BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix",
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd => "FuncAdd",
+			Silk.NET.OpenGL.BlendEquationModeEXT.Min => "Min",
+			Silk.NET.OpenGL.BlendEquationModeEXT.Max => "Max",
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract => "FuncSubtract",
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract",
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix",
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this BlendEquationModeEXT value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this Silk.NET.OpenGL.BlendEquationModeEXT value)
 	{
 		return value switch
 		{
-			BlendEquationModeEXT.FuncAdd => "FuncAdd"u8,
-			BlendEquationModeEXT.Min => "Min"u8,
-			BlendEquationModeEXT.Max => "Max"u8,
-			BlendEquationModeEXT.FuncSubtract => "FuncSubtract"u8,
-			BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract"u8,
-			BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix"u8,
-			BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd => "FuncAdd"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.Min => "Min"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.Max => "Max"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract => "FuncSubtract"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract => "FuncReverseSubtract"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix => "AlphaMinSgix"u8,
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix => "AlphaMaxSgix"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}

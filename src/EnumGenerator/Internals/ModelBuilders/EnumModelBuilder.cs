@@ -13,6 +13,7 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 		return new EnumModel
 		{
 			EnumName = enumDeclarationSyntax.Identifier.Text,
+			EnumTypeName = enumSymbol.ToDisplayString(),
 			NamespaceName = enumSymbol.ContainingNamespace.ToDisplayString(),
 			Accessibility = enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
 			Members = GetMemberNames(),

@@ -12,34 +12,34 @@ namespace Tests;
 
 internal static class TestEnumUtilities
 {
-	public static IReadOnlyList<TestEnum> Values { get; } = Enum.GetValues<TestEnum>();
+	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "None\0First\0Second\0Third\0Fourth\0Fifth\0"u8;
 
-	public static string ToStringFast(this TestEnum value)
+	public static string ToStringFast(this Tests.TestEnum value)
 	{
 		return value switch
 		{
-			TestEnum.None => "None",
-			TestEnum.First => "First",
-			TestEnum.Second => "Second",
-			TestEnum.Third => "Third",
-			TestEnum.Fourth => "Fourth",
-			TestEnum.Fifth => "Fifth",
+			Tests.TestEnum.None => "None",
+			Tests.TestEnum.First => "First",
+			Tests.TestEnum.Second => "Second",
+			Tests.TestEnum.Third => "Third",
+			Tests.TestEnum.Fourth => "Fourth",
+			Tests.TestEnum.Fifth => "Fifth",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this TestEnum value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestEnum value)
 	{
 		return value switch
 		{
-			TestEnum.None => "None"u8,
-			TestEnum.First => "First"u8,
-			TestEnum.Second => "Second"u8,
-			TestEnum.Third => "Third"u8,
-			TestEnum.Fourth => "Fourth"u8,
-			TestEnum.Fifth => "Fifth"u8,
+			Tests.TestEnum.None => "None"u8,
+			Tests.TestEnum.First => "First"u8,
+			Tests.TestEnum.Second => "Second"u8,
+			Tests.TestEnum.Third => "Third"u8,
+			Tests.TestEnum.Fourth => "Fourth"u8,
+			Tests.TestEnum.Fifth => "Fifth"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}

@@ -62,6 +62,7 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 			enumModels.Add(new EnumModel
 			{
 				EnumName = enumType.Name,
+				EnumTypeName = enumType.ToDisplayString(),
 				NamespaceName = enumType.ContainingNamespace.ToDisplayString(),
 				Accessibility = "public",
 				Members = enumType

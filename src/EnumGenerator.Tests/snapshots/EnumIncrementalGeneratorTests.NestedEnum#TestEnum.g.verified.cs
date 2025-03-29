@@ -12,9 +12,9 @@ namespace Tests;
 
 internal static class TestEnumUtils
 {
-	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
+	public static IReadOnlyList<Tests.TestClass.TestEnum> Values { get; } = Enum.GetValues<Tests.TestClass.TestEnum>();
 
-	public static string ToStringFast(this Tests.TestEnum value)
+	public static string ToStringFast(this Tests.TestClass.TestEnum value)
 	{
 		return value switch
 		{
@@ -22,7 +22,7 @@ internal static class TestEnumUtils
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestEnum value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestClass.TestEnum value)
 	{
 		return value switch
 		{

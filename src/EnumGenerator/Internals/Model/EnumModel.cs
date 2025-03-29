@@ -4,6 +4,8 @@ internal sealed record EnumModel
 {
 	public required string EnumName { get; init; }
 
+	public required string EnumTypeName { get; init; }
+
 	public required string NamespaceName { get; init; }
 
 	public required string Accessibility { get; init; }

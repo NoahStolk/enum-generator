@@ -355,4 +355,23 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task NestedEnum()
+	{
+		const string code =
+			"""
+			using EnumGenerator;
+			namespace Tests;
+			internal class TestClass
+			{
+				[GenerateEnumUtilities]
+				internal enum TestEnum
+				{
+				}
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
 }

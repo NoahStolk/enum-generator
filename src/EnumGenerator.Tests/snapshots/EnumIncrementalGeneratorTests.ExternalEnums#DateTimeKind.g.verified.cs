@@ -11,28 +11,28 @@ namespace System;
 
 public static class DateTimeKindUtils
 {
-	public static IReadOnlyList<DateTimeKind> Values { get; } = Enum.GetValues<DateTimeKind>();
+	public static IReadOnlyList<System.DateTimeKind> Values { get; } = Enum.GetValues<System.DateTimeKind>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Unspecified\0Utc\0Local\0"u8;
 
-	public static string ToStringFast(this DateTimeKind value)
+	public static string ToStringFast(this System.DateTimeKind value)
 	{
 		return value switch
 		{
-			DateTimeKind.Unspecified => "Unspecified",
-			DateTimeKind.Utc => "Utc",
-			DateTimeKind.Local => "Local",
+			System.DateTimeKind.Unspecified => "Unspecified",
+			System.DateTimeKind.Utc => "Utc",
+			System.DateTimeKind.Local => "Local",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this DateTimeKind value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this System.DateTimeKind value)
 	{
 		return value switch
 		{
-			DateTimeKind.Unspecified => "Unspecified"u8,
-			DateTimeKind.Utc => "Utc"u8,
-			DateTimeKind.Local => "Local"u8,
+			System.DateTimeKind.Unspecified => "Unspecified"u8,
+			System.DateTimeKind.Utc => "Utc"u8,
+			System.DateTimeKind.Local => "Local"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}

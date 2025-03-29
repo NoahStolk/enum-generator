@@ -11,36 +11,36 @@ namespace System;
 
 public static class DayOfWeekUtils
 {
-	public static IReadOnlyList<DayOfWeek> Values { get; } = Enum.GetValues<DayOfWeek>();
+	public static IReadOnlyList<System.DayOfWeek> Values { get; } = Enum.GetValues<System.DayOfWeek>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Sunday\0Monday\0Tuesday\0Wednesday\0Thursday\0Friday\0Saturday\0"u8;
 
-	public static string ToStringFast(this DayOfWeek value)
+	public static string ToStringFast(this System.DayOfWeek value)
 	{
 		return value switch
 		{
-			DayOfWeek.Sunday => "Sunday",
-			DayOfWeek.Monday => "Monday",
-			DayOfWeek.Tuesday => "Tuesday",
-			DayOfWeek.Wednesday => "Wednesday",
-			DayOfWeek.Thursday => "Thursday",
-			DayOfWeek.Friday => "Friday",
-			DayOfWeek.Saturday => "Saturday",
+			System.DayOfWeek.Sunday => "Sunday",
+			System.DayOfWeek.Monday => "Monday",
+			System.DayOfWeek.Tuesday => "Tuesday",
+			System.DayOfWeek.Wednesday => "Wednesday",
+			System.DayOfWeek.Thursday => "Thursday",
+			System.DayOfWeek.Friday => "Friday",
+			System.DayOfWeek.Saturday => "Saturday",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
 
-	public static ReadOnlySpan<byte> AsUtf8Span(this DayOfWeek value)
+	public static ReadOnlySpan<byte> AsUtf8Span(this System.DayOfWeek value)
 	{
 		return value switch
 		{
-			DayOfWeek.Sunday => "Sunday"u8,
-			DayOfWeek.Monday => "Monday"u8,
-			DayOfWeek.Tuesday => "Tuesday"u8,
-			DayOfWeek.Wednesday => "Wednesday"u8,
-			DayOfWeek.Thursday => "Thursday"u8,
-			DayOfWeek.Friday => "Friday"u8,
-			DayOfWeek.Saturday => "Saturday"u8,
+			System.DayOfWeek.Sunday => "Sunday"u8,
+			System.DayOfWeek.Monday => "Monday"u8,
+			System.DayOfWeek.Tuesday => "Tuesday"u8,
+			System.DayOfWeek.Wednesday => "Wednesday"u8,
+			System.DayOfWeek.Thursday => "Thursday"u8,
+			System.DayOfWeek.Friday => "Friday"u8,
+			System.DayOfWeek.Saturday => "Saturday"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}

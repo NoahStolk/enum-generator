@@ -15,7 +15,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 
 	private string GetClassName()
 	{
-		// TODO: Maybe also check if the class name is a valid C# identifier.
+		// TODO: Maybe also check if GeneratedClassName is a valid C# identifier.
 		if (string.IsNullOrWhiteSpace(enumModel.GeneratedClassName))
 			return $"{enumModel.EnumName}Utils";
 
@@ -43,7 +43,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine($"{enumModel.Accessibility} static class {GetClassName()}");
 		writer.StartBlock();
 
-		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumName}}>();""");
+		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumTypeName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumTypeName}}>();""");
 		writer.WriteLine();
 
 		if (relevantMembers.Count > 0)
@@ -53,22 +53,22 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 			writer.WriteLine();
 		}
 
-		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumName} value)");
+		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
 		foreach (EnumMemberModel member in relevantMembers)
-			writer.WriteLine($"{enumModel.EnumName}.{member.Name} => \"{member.DisplayName}\",");
+			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\",");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 		writer.WriteLine();
-		writer.WriteLine($"public static ReadOnlySpan<byte> AsUtf8Span(this {enumModel.EnumName} value)");
+		writer.WriteLine($"public static ReadOnlySpan<byte> AsUtf8Span(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
 		foreach (EnumMemberModel member in relevantMembers)
-			writer.WriteLine($"{enumModel.EnumName}.{member.Name} => \"{member.DisplayName}\"u8,");
+			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
@@ -76,7 +76,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		if (enumModel.HasFlagsAttribute)
 		{
 			writer.WriteLine();
-			writer.WriteLine($"public static bool HasFlagFast(this {enumModel.EnumName} value, {enumModel.EnumName} flag)");
+			writer.WriteLine($"public static bool HasFlagFast(this {enumModel.EnumTypeName} value, {enumModel.EnumTypeName} flag)");
 			writer.StartBlock();
 			writer.WriteLine("return (value & flag) != 0;");
 			writer.EndBlock();
