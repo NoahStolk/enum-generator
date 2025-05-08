@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EnumGenerator.Sample.Enums;
+namespace EnumGenerator.Tests.Integration.Enums;
 
 [GenerateEnumUtilities]
 internal enum Language

@@ -43,4 +43,32 @@ public static class TestEnumUtilities
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this Tests.TestEnum value)
+	{
+		return value switch
+		{
+			Tests.TestEnum.None => 0,
+			Tests.TestEnum.First => 1,
+			Tests.TestEnum.Second => 2,
+			Tests.TestEnum.Third => 3,
+			Tests.TestEnum.Fourth => 4,
+			Tests.TestEnum.Fifth => 5,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static Tests.TestEnum FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => Tests.TestEnum.None,
+			1 => Tests.TestEnum.First,
+			2 => Tests.TestEnum.Second,
+			3 => Tests.TestEnum.Third,
+			4 => Tests.TestEnum.Fourth,
+			5 => Tests.TestEnum.Fifth,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

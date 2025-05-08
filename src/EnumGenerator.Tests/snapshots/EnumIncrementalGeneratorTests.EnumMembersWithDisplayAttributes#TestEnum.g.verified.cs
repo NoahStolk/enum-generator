@@ -35,4 +35,24 @@ internal static class TestEnumGen
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this Tests.TestEnum value)
+	{
+		return value switch
+		{
+			Tests.TestEnum.CSharp => 0,
+			Tests.TestEnum.CPlusPlus => 1,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static Tests.TestEnum FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => Tests.TestEnum.CSharp,
+			1 => Tests.TestEnum.CPlusPlus,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

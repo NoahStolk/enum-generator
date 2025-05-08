@@ -35,4 +35,24 @@ public static class TestEnumGen
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this Tests.TestEnum value)
+	{
+		return value switch
+		{
+			Tests.TestEnum.Member0 => 0,
+			Tests.TestEnum.Member1 => 1,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static Tests.TestEnum FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => Tests.TestEnum.Member0,
+			1 => Tests.TestEnum.Member1,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

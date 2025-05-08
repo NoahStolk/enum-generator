@@ -36,4 +36,26 @@ public static class DateTimeKindGen
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this System.DateTimeKind value)
+	{
+		return value switch
+		{
+			System.DateTimeKind.Unspecified => 0,
+			System.DateTimeKind.Utc => 1,
+			System.DateTimeKind.Local => 2,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static System.DateTimeKind FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => System.DateTimeKind.Unspecified,
+			1 => System.DateTimeKind.Utc,
+			2 => System.DateTimeKind.Local,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

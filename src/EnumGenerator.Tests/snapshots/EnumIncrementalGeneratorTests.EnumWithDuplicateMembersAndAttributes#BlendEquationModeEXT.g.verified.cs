@@ -45,4 +45,34 @@ public static class BlendEquationModeEXTGen
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this Silk.NET.OpenGL.BlendEquationModeEXT value)
+	{
+		return value switch
+		{
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd => 0,
+			Silk.NET.OpenGL.BlendEquationModeEXT.Min => 1,
+			Silk.NET.OpenGL.BlendEquationModeEXT.Max => 2,
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract => 3,
+			Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract => 4,
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix => 5,
+			Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix => 6,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static Silk.NET.OpenGL.BlendEquationModeEXT FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd,
+			1 => Silk.NET.OpenGL.BlendEquationModeEXT.Min,
+			2 => Silk.NET.OpenGL.BlendEquationModeEXT.Max,
+			3 => Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract,
+			4 => Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract,
+			5 => Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix,
+			6 => Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

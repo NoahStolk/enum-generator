@@ -44,4 +44,34 @@ public static class DayOfWeekGen
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
+
+	public static int GetIndex(this System.DayOfWeek value)
+	{
+		return value switch
+		{
+			System.DayOfWeek.Sunday => 0,
+			System.DayOfWeek.Monday => 1,
+			System.DayOfWeek.Tuesday => 2,
+			System.DayOfWeek.Wednesday => 3,
+			System.DayOfWeek.Thursday => 4,
+			System.DayOfWeek.Friday => 5,
+			System.DayOfWeek.Saturday => 6,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
+	public static System.DayOfWeek FromIndex(int index)
+	{
+		return index switch
+		{
+			0 => System.DayOfWeek.Sunday,
+			1 => System.DayOfWeek.Monday,
+			2 => System.DayOfWeek.Tuesday,
+			3 => System.DayOfWeek.Wednesday,
+			4 => System.DayOfWeek.Thursday,
+			5 => System.DayOfWeek.Friday,
+			6 => System.DayOfWeek.Saturday,
+			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
+		};
+	}
 }

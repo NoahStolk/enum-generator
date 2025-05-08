@@ -73,6 +73,36 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 
+		writer.WriteLine();
+		writer.WriteLine($"public static int GetIndex(this {enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		writer.WriteLine("return value switch");
+		writer.StartBlock();
+		for (int i = 0; i < relevantMembers.Count; i++)
+		{
+			EnumMemberModel member = relevantMembers[i];
+			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => {i},");
+		}
+
+		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+		writer.EndBlockWithSemicolon();
+		writer.EndBlock();
+
+		writer.WriteLine();
+		writer.WriteLine($"public static {enumModel.EnumTypeName} FromIndex(int index)");
+		writer.StartBlock();
+		writer.WriteLine("return index switch");
+		writer.StartBlock();
+		for (int i = 0; i < relevantMembers.Count; i++)
+		{
+			EnumMemberModel member = relevantMembers[i];
+			writer.WriteLine($"{i} => {enumModel.EnumTypeName}.{member.Name},");
+		}
+
+		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),");
+		writer.EndBlockWithSemicolon();
+		writer.EndBlock();
+
 		if (enumModel.HasFlagsAttribute)
 		{
 			writer.WriteLine();
