@@ -8,93 +8,70 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Tests;
 
 internal static class TestEnumGen
 {
+	private static readonly Dictionary<Tests.TestEnum, string> _stringValues = new()
+	{
+		{ (Tests.TestEnum)0, "None" },
+		{ (Tests.TestEnum)1, "First" },
+		{ (Tests.TestEnum)2, "Second" },
+		{ (Tests.TestEnum)3, "First, Second" },
+		{ (Tests.TestEnum)4, "Third" },
+		{ (Tests.TestEnum)5, "First, Third" },
+		{ (Tests.TestEnum)6, "Second, Third" },
+		{ (Tests.TestEnum)7, "First, Second, Third" },
+		{ (Tests.TestEnum)8, "Fourth" },
+		{ (Tests.TestEnum)9, "First, Fourth" },
+		{ (Tests.TestEnum)10, "Second, Fourth" },
+		{ (Tests.TestEnum)11, "First, Second, Fourth" },
+		{ (Tests.TestEnum)12, "Third, Fourth" },
+		{ (Tests.TestEnum)13, "First, Third, Fourth" },
+		{ (Tests.TestEnum)14, "Second, Third, Fourth" },
+		{ (Tests.TestEnum)15, "First, Second, Third, Fourth" },
+		{ (Tests.TestEnum)16, "Fifth" },
+		{ (Tests.TestEnum)17, "First, Fifth" },
+		{ (Tests.TestEnum)18, "Second, Fifth" },
+		{ (Tests.TestEnum)19, "First, Second, Fifth" },
+		{ (Tests.TestEnum)20, "Third, Fifth" },
+		{ (Tests.TestEnum)21, "First, Third, Fifth" },
+		{ (Tests.TestEnum)22, "Second, Third, Fifth" },
+		{ (Tests.TestEnum)23, "First, Second, Third, Fifth" },
+		{ (Tests.TestEnum)24, "Fourth, Fifth" },
+		{ (Tests.TestEnum)25, "First, Fourth, Fifth" },
+		{ (Tests.TestEnum)26, "Second, Fourth, Fifth" },
+		{ (Tests.TestEnum)27, "First, Second, Fourth, Fifth" },
+		{ (Tests.TestEnum)28, "Third, Fourth, Fifth" },
+		{ (Tests.TestEnum)29, "First, Third, Fourth, Fifth" },
+		{ (Tests.TestEnum)30, "Second, Third, Fourth, Fifth" },
+		{ (Tests.TestEnum)31, "First, Second, Third, Fourth, Fifth" },
+	};
+	private static readonly Dictionary<Tests.TestEnum, byte[]> _utf8Cache = new();
+
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "None\0First\0Second\0Third\0Fourth\0Fifth\0"u8;
 
 	public static string ToStringFast(this Tests.TestEnum value)
 	{
-		return value switch
-		{
-			Tests.TestEnum.None => "None",
-			Tests.TestEnum.First => "First",
-			Tests.TestEnum.Second => "Second",
-			Tests.TestEnum.Third => "Third",
-			Tests.TestEnum.Fourth => "Fourth",
-			Tests.TestEnum.Fifth => "Fifth",
-			(Tests.TestEnum)3 => "First, Second",
-			(Tests.TestEnum)5 => "First, Third",
-			(Tests.TestEnum)6 => "Second, Third",
-			(Tests.TestEnum)7 => "First, Second, Third",
-			(Tests.TestEnum)9 => "First, Fourth",
-			(Tests.TestEnum)10 => "Second, Fourth",
-			(Tests.TestEnum)11 => "First, Second, Fourth",
-			(Tests.TestEnum)12 => "Third, Fourth",
-			(Tests.TestEnum)13 => "First, Third, Fourth",
-			(Tests.TestEnum)14 => "Second, Third, Fourth",
-			(Tests.TestEnum)15 => "First, Second, Third, Fourth",
-			(Tests.TestEnum)17 => "First, Fifth",
-			(Tests.TestEnum)18 => "Second, Fifth",
-			(Tests.TestEnum)19 => "First, Second, Fifth",
-			(Tests.TestEnum)20 => "Third, Fifth",
-			(Tests.TestEnum)21 => "First, Third, Fifth",
-			(Tests.TestEnum)22 => "Second, Third, Fifth",
-			(Tests.TestEnum)23 => "First, Second, Third, Fifth",
-			(Tests.TestEnum)24 => "Fourth, Fifth",
-			(Tests.TestEnum)25 => "First, Fourth, Fifth",
-			(Tests.TestEnum)26 => "Second, Fourth, Fifth",
-			(Tests.TestEnum)27 => "First, Second, Fourth, Fifth",
-			(Tests.TestEnum)28 => "Third, Fourth, Fifth",
-			(Tests.TestEnum)29 => "First, Third, Fourth, Fifth",
-			(Tests.TestEnum)30 => "Second, Third, Fourth, Fifth",
-			(Tests.TestEnum)31 => "First, Second, Third, Fourth, Fifth",
-			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
-		};
+		return _stringValues.TryGetValue(value, out string? stringValue) ? stringValue : throw new ArgumentOutOfRangeException(nameof(value), value, null);
 	}
 
 	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestEnum value)
 	{
-		return value switch
+		if (!_stringValues.TryGetValue(value, out string? str))
+			throw new ArgumentOutOfRangeException(nameof(value), value, null);
+
+		if (!_utf8Cache.TryGetValue(value, out byte[]? bytes))
 		{
-			Tests.TestEnum.None => "None"u8,
-			Tests.TestEnum.First => "First"u8,
-			Tests.TestEnum.Second => "Second"u8,
-			Tests.TestEnum.Third => "Third"u8,
-			Tests.TestEnum.Fourth => "Fourth"u8,
-			Tests.TestEnum.Fifth => "Fifth"u8,
-			(Tests.TestEnum)3 => "First, Second"u8,
-			(Tests.TestEnum)5 => "First, Third"u8,
-			(Tests.TestEnum)6 => "Second, Third"u8,
-			(Tests.TestEnum)7 => "First, Second, Third"u8,
-			(Tests.TestEnum)9 => "First, Fourth"u8,
-			(Tests.TestEnum)10 => "Second, Fourth"u8,
-			(Tests.TestEnum)11 => "First, Second, Fourth"u8,
-			(Tests.TestEnum)12 => "Third, Fourth"u8,
-			(Tests.TestEnum)13 => "First, Third, Fourth"u8,
-			(Tests.TestEnum)14 => "Second, Third, Fourth"u8,
-			(Tests.TestEnum)15 => "First, Second, Third, Fourth"u8,
-			(Tests.TestEnum)17 => "First, Fifth"u8,
-			(Tests.TestEnum)18 => "Second, Fifth"u8,
-			(Tests.TestEnum)19 => "First, Second, Fifth"u8,
-			(Tests.TestEnum)20 => "Third, Fifth"u8,
-			(Tests.TestEnum)21 => "First, Third, Fifth"u8,
-			(Tests.TestEnum)22 => "Second, Third, Fifth"u8,
-			(Tests.TestEnum)23 => "First, Second, Third, Fifth"u8,
-			(Tests.TestEnum)24 => "Fourth, Fifth"u8,
-			(Tests.TestEnum)25 => "First, Fourth, Fifth"u8,
-			(Tests.TestEnum)26 => "Second, Fourth, Fifth"u8,
-			(Tests.TestEnum)27 => "First, Second, Fourth, Fifth"u8,
-			(Tests.TestEnum)28 => "Third, Fourth, Fifth"u8,
-			(Tests.TestEnum)29 => "First, Third, Fourth, Fifth"u8,
-			(Tests.TestEnum)30 => "Second, Third, Fourth, Fifth"u8,
-			(Tests.TestEnum)31 => "First, Second, Third, Fourth, Fifth"u8,
-			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
-		};
+			bytes = Encoding.UTF8.GetBytes(str);
+			_utf8Cache[value] = bytes;
+		}
+
+		return new ReadOnlySpan<byte>(bytes);
 	}
 
 	public static int GetIndex(this Tests.TestEnum value)
