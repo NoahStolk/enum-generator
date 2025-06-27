@@ -423,4 +423,34 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task FlagsByte()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			namespace Tests;
+			[Flags]
+			[GenerateEnumUtilities]
+			public enum Indices : byte
+			{
+				None = 0b0000_0000,
+
+				N1 = 0b0000_0001,
+				N2 = 0b0000_0010,
+				N3 = 0b0000_0100,
+				N4 = 0b0000_1000,
+				N5 = 0b0001_0000,
+				N6 = 0b0010_0000,
+				N7 = 0b0100_0000,
+				N8 = 0b1000_0000,
+
+				All = 0b1111_1111,
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
 }

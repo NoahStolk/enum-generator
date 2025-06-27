@@ -37,6 +37,16 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 			relevantMembers = relevantMembers.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue)).ToList();
 		}
 
+		int bitCount = enumModel.EnumUnderlyingTypeName switch
+		{
+			"byte" or "sbyte" => 8,
+			"short" or "ushort" => 16,
+			"int" or "uint" => 32,
+			"long" or "ulong" => 64,
+			_ => throw new InvalidOperationException($"Unsupported enum underlying type: {enumModel.EnumUnderlyingTypeName}"),
+		};
+		bool isExhaustive = relevantMembers.Count + flagValues.Count == (int)Math.Pow(2, bitCount);
+
 		CodeWriter writer = new();
 		AddUsingIfNeeded(writer, "System");
 		AddUsingIfNeeded(writer, "System.Collections.Generic");
@@ -65,7 +75,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\",");
 		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
 			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\",");
-		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+		if (!isExhaustive)
+			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 		writer.WriteLine();
@@ -77,7 +88,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
 		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
 			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\"u8,");
-		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+		if (!isExhaustive)
+			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 
