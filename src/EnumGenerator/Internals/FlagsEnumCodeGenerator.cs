@@ -7,6 +7,11 @@ namespace EnumGenerator.Internals;
 
 internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 {
+	private static bool IsPowerOfTwo(BigInteger value)
+	{
+		return value != 0 && (value & (value - 1)) == 0;
+	}
+
 	public string Generate()
 	{
 		if (!enumModel.HasFlagsAttribute)
@@ -16,8 +21,6 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 			.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue))
 			.DistinctBy(m => m.ConstantValue)
 			.ToList();
-
-		Dictionary<BigInteger, string> flagValues = GetCombinedStringValues(uniqueMembers);
 
 		CodeWriter writer = new();
 		writer.AddUsingIfNeeded(enumModel, "System");
@@ -30,11 +33,26 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine($"{enumModel.Accessibility} static class {enumModel.GetClassName()}");
 		writer.StartBlock();
 
-		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, string> _stringValues = new()");
+		writer.WriteLine($"private static readonly {enumModel.EnumTypeName} _definedBits =");
+		writer.StartIndent();
+		for (int i = 0; i < uniqueMembers.Count; i++)
+		{
+			EnumMemberModel member = uniqueMembers[i];
+			if (i == uniqueMembers.Count - 1)
+				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name};");
+			else
+				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} |");
+		}
+
+		writer.WriteLine();
+		writer.EndIndent();
+		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, string> _stringCache = new()");
 		writer.StartBlock();
-		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
-			writer.WriteLine($"{{ ({enumModel.EnumTypeName}){flagKvp.Key}, \"{flagKvp.Value}\" }},");
+		foreach (EnumMemberModel member in uniqueMembers)
+			writer.WriteLine($"{{ {enumModel.EnumTypeName}.{member.Name}, \"{member.DisplayName}\" }},");
 		writer.EndBlockWithSemicolon();
+		writer.WriteLine();
+
 		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, byte[]> _utf8Cache = new();");
 		writer.WriteLine();
 
@@ -45,23 +63,53 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
-		writer.WriteLine("return _stringValues.TryGetValue(value, out string? stringValue) ? stringValue : throw new ArgumentOutOfRangeException(nameof(value), value, null);");
+		writer.WriteLine("if (_stringCache.TryGetValue(value, out string? str))");
+		writer.StartIndent();
+		writer.WriteLine("return str;");
+		writer.EndIndent();
+		writer.WriteLine();
+		writer.WriteLine("str = GetFlagsString(value);");
+		writer.WriteLine("_stringCache[value] = str;");
+		writer.WriteLine("return str;");
+		writer.EndBlock();
+		writer.WriteLine();
+
+		writer.WriteLine($"private static string GetFlagsString({enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		writer.WriteLine($"{enumModel.EnumUnderlyingTypeName} raw = ({enumModel.EnumUnderlyingTypeName})value;");
+		writer.WriteLine("if (raw == 0)");
+		writer.StartIndent();
+		writer.WriteLine("throw new ArgumentOutOfRangeException(nameof(value), value, null); // This means 0 is not a defined member, otherwise it would have been cached");
+		writer.EndIndent();
+		writer.WriteLine();
+		writer.WriteLine($"if ((raw & ~({enumModel.EnumUnderlyingTypeName})_definedBits) != 0)");
+		writer.StartIndent();
+		writer.WriteLine("throw new ArgumentOutOfRangeException(nameof(value), value, null);");
+		writer.EndIndent();
+		writer.WriteLine();
+		writer.WriteLine("List<string> names = new(Values.Count);");
+		writer.WriteLine($"foreach ({enumModel.EnumTypeName} item in Values)");
+		writer.StartBlock();
+		writer.WriteLine($"{enumModel.EnumUnderlyingTypeName} itemRaw = ({enumModel.EnumUnderlyingTypeName})item;");
+		writer.WriteLine("if (itemRaw != 0 && (raw & itemRaw) == itemRaw)");
+		writer.StartIndent();
+		writer.WriteLine("names.Add(_stringCache[item]); // Must be present in cache (defined flags are always pre-initialized)");
+		writer.EndIndent();
+		writer.EndBlock();
+		writer.WriteLine();
+		writer.WriteLine("return string.Join(\", \", names);");
 		writer.EndBlock();
 		writer.WriteLine();
 
 		writer.WriteLine($"public static ReadOnlySpan<byte> AsUtf8Span(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
-		writer.WriteLine("if (!_stringValues.TryGetValue(value, out string? str))");
+		writer.WriteLine("if (_utf8Cache.TryGetValue(value, out byte[]? bytes))");
 		writer.StartIndent();
-		writer.WriteLine("throw new ArgumentOutOfRangeException(nameof(value), value, null);");
+		writer.WriteLine("return new ReadOnlySpan<byte>(bytes);");
 		writer.EndIndent();
 		writer.WriteLine();
-		writer.WriteLine("if (!_utf8Cache.TryGetValue(value, out byte[]? bytes))");
-		writer.StartBlock();
-		writer.WriteLine("bytes = Encoding.UTF8.GetBytes(str);");
+		writer.WriteLine("bytes = Encoding.UTF8.GetBytes(value.ToStringFast());");
 		writer.WriteLine("_utf8Cache[value] = bytes;");
-		writer.EndBlock();
-		writer.WriteLine();
 		writer.WriteLine("return new ReadOnlySpan<byte>(bytes);");
 		writer.EndBlock();
 		writer.WriteLine();
@@ -89,44 +137,5 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlock();
 
 		return writer.ToString();
-	}
-
-	private static Dictionary<BigInteger, string> GetCombinedStringValues(List<EnumMemberModel> enumValues)
-	{
-		List<EnumMemberModel> flagValues = enumValues
-			.Where(v => v.ConstantValue == 0 || IsPowerOfTwo(v.ConstantValue))
-			.ToList();
-
-		Dictionary<BigInteger, string> combinations = new();
-		int count = flagValues.Count;
-		for (int i = 0; i < 1 << count; i++)
-		{
-			BigInteger value = 0;
-			List<string> parts = [];
-			for (int j = 0; j < count; j++)
-			{
-				if (((i >> j) & 1) == 0)
-					continue;
-
-				BigInteger val = flagValues[j].ConstantValue;
-				if (val == 0)
-					continue;
-
-				value |= val;
-				parts.Add(enumValues.Find(v => v.ConstantValue == val).DisplayName);
-			}
-
-			if (value == 0)
-				combinations[value] = enumValues.Find(v => v.ConstantValue == 0).DisplayName;
-			else
-				combinations[value] = string.Join(", ", parts);
-		}
-
-		return combinations;
-	}
-
-	private static bool IsPowerOfTwo(BigInteger value)
-	{
-		return value != 0 && (value & (value - 1)) == 0;
 	}
 }

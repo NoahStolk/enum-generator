@@ -14,41 +14,24 @@ namespace Tests;
 
 internal static class TestEnumGen
 {
-	private static readonly Dictionary<Tests.TestEnum, string> _stringValues = new()
+	private static readonly Tests.TestEnum _definedBits =
+		Tests.TestEnum.None |
+		Tests.TestEnum.First |
+		Tests.TestEnum.Second |
+		Tests.TestEnum.Third |
+		Tests.TestEnum.Fourth |
+		Tests.TestEnum.Fifth;
+
+	private static readonly Dictionary<Tests.TestEnum, string> _stringCache = new()
 	{
-		{ (Tests.TestEnum)0, "None" },
-		{ (Tests.TestEnum)1, "First" },
-		{ (Tests.TestEnum)2, "Second" },
-		{ (Tests.TestEnum)3, "First, Second" },
-		{ (Tests.TestEnum)4, "Third" },
-		{ (Tests.TestEnum)5, "First, Third" },
-		{ (Tests.TestEnum)6, "Second, Third" },
-		{ (Tests.TestEnum)7, "First, Second, Third" },
-		{ (Tests.TestEnum)8, "Fourth" },
-		{ (Tests.TestEnum)9, "First, Fourth" },
-		{ (Tests.TestEnum)10, "Second, Fourth" },
-		{ (Tests.TestEnum)11, "First, Second, Fourth" },
-		{ (Tests.TestEnum)12, "Third, Fourth" },
-		{ (Tests.TestEnum)13, "First, Third, Fourth" },
-		{ (Tests.TestEnum)14, "Second, Third, Fourth" },
-		{ (Tests.TestEnum)15, "First, Second, Third, Fourth" },
-		{ (Tests.TestEnum)16, "Fifth" },
-		{ (Tests.TestEnum)17, "First, Fifth" },
-		{ (Tests.TestEnum)18, "Second, Fifth" },
-		{ (Tests.TestEnum)19, "First, Second, Fifth" },
-		{ (Tests.TestEnum)20, "Third, Fifth" },
-		{ (Tests.TestEnum)21, "First, Third, Fifth" },
-		{ (Tests.TestEnum)22, "Second, Third, Fifth" },
-		{ (Tests.TestEnum)23, "First, Second, Third, Fifth" },
-		{ (Tests.TestEnum)24, "Fourth, Fifth" },
-		{ (Tests.TestEnum)25, "First, Fourth, Fifth" },
-		{ (Tests.TestEnum)26, "Second, Fourth, Fifth" },
-		{ (Tests.TestEnum)27, "First, Second, Fourth, Fifth" },
-		{ (Tests.TestEnum)28, "Third, Fourth, Fifth" },
-		{ (Tests.TestEnum)29, "First, Third, Fourth, Fifth" },
-		{ (Tests.TestEnum)30, "Second, Third, Fourth, Fifth" },
-		{ (Tests.TestEnum)31, "First, Second, Third, Fourth, Fifth" },
+		{ Tests.TestEnum.None, "None" },
+		{ Tests.TestEnum.First, "First" },
+		{ Tests.TestEnum.Second, "Second" },
+		{ Tests.TestEnum.Third, "Third" },
+		{ Tests.TestEnum.Fourth, "Fourth" },
+		{ Tests.TestEnum.Fifth, "Fifth" },
 	};
+
 	private static readonly Dictionary<Tests.TestEnum, byte[]> _utf8Cache = new();
 
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
@@ -57,20 +40,41 @@ internal static class TestEnumGen
 
 	public static string ToStringFast(this Tests.TestEnum value)
 	{
-		return _stringValues.TryGetValue(value, out string? stringValue) ? stringValue : throw new ArgumentOutOfRangeException(nameof(value), value, null);
+		if (_stringCache.TryGetValue(value, out string? str))
+			return str;
+
+		str = GetFlagsString(value);
+		_stringCache[value] = str;
+		return str;
+	}
+
+	private static string GetFlagsString(Tests.TestEnum value)
+	{
+		int raw = (int)value;
+		if (raw == 0)
+			throw new ArgumentOutOfRangeException(nameof(value), value, null); // This means 0 is not a defined member, otherwise it would have been cached
+
+		if ((raw & ~(int)_definedBits) != 0)
+			throw new ArgumentOutOfRangeException(nameof(value), value, null);
+
+		List<string> names = new(Values.Count);
+		foreach (Tests.TestEnum item in Values)
+		{
+			int itemRaw = (int)item;
+			if (itemRaw != 0 && (raw & itemRaw) == itemRaw)
+				names.Add(_stringCache[item]); // Must be present in cache (defined flags are always pre-initialized)
+		}
+
+		return string.Join(", ", names);
 	}
 
 	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestEnum value)
 	{
-		if (!_stringValues.TryGetValue(value, out string? str))
-			throw new ArgumentOutOfRangeException(nameof(value), value, null);
+		if (_utf8Cache.TryGetValue(value, out byte[]? bytes))
+			return new ReadOnlySpan<byte>(bytes);
 
-		if (!_utf8Cache.TryGetValue(value, out byte[]? bytes))
-		{
-			bytes = Encoding.UTF8.GetBytes(str);
-			_utf8Cache[value] = bytes;
-		}
-
+		bytes = Encoding.UTF8.GetBytes(value.ToStringFast());
+		_utf8Cache[value] = bytes;
 		return new ReadOnlySpan<byte>(bytes);
 	}
 

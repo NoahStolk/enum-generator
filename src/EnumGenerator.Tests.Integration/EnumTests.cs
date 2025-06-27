@@ -50,6 +50,36 @@ public sealed class EnumTests
 		Assert.Equal("A, B, C, D, E", (FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).ToStringFast());
 		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)32).ToStringFast());
 		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)33).ToStringFast());
+
+		Assert.Equal("None", FlagsTypeWithMissingBits.None.ToStringFast());
+		Assert.Equal("A", FlagsTypeWithMissingBits.A.ToStringFast());
+		Assert.Equal("B", FlagsTypeWithMissingBits.B.ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)4).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)5).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)6).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)7).ToStringFast());
+		Assert.Equal("D", FlagsTypeWithMissingBits.D.ToStringFast());
+		Assert.Equal("E", FlagsTypeWithMissingBits.E.ToStringFast());
+
+		Assert.Equal("A, B", (FlagsTypeWithMissingBits.None | FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).ToStringFast());
+		Assert.Equal("A, B", (FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).ToStringFast());
+		Assert.Equal("B, D", (FlagsTypeWithMissingBits.B | FlagsTypeWithMissingBits.D).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)31).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)32).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)33).ToStringFast());
+
+		Assert.Equal("No value", NamedFlagsType.None.ToStringFast());
+		Assert.Equal("Value A", NamedFlagsType.A.ToStringFast());
+		Assert.Equal("Value B", NamedFlagsType.B.ToStringFast());
+		Assert.Equal("Value C", NamedFlagsType.C.ToStringFast());
+		Assert.Equal("Value D", NamedFlagsType.D.ToStringFast());
+		Assert.Equal("Value E", NamedFlagsType.E.ToStringFast());
+
+		Assert.Equal("Value A, Value B", (NamedFlagsType.None | NamedFlagsType.A | NamedFlagsType.B).ToStringFast());
+		Assert.Equal("Value A, Value B", (NamedFlagsType.A | NamedFlagsType.B).ToStringFast());
+		Assert.Equal("Value A, Value B, Value C", (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).ToStringFast());
+		Assert.Equal("Value B, Value D", (NamedFlagsType.B | NamedFlagsType.D).ToStringFast());
+		Assert.Equal("Value A, Value B, Value C, Value D, Value E", (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).ToStringFast());
 	}
 
 	[Fact]
@@ -67,6 +97,13 @@ public sealed class EnumTests
 		Assert.True("Unspecified"u8.SequenceEqual(DateTimeKind.Unspecified.AsUtf8Span()));
 		Assert.Throws<ArgumentOutOfRangeException>(() => ((DateTimeKind)3).AsUtf8Span());
 
+		Assert.Equal("None"u8, FlagsType.None.AsUtf8Span());
+		Assert.Equal("A"u8, FlagsType.A.AsUtf8Span());
+		Assert.Equal("B"u8, FlagsType.B.AsUtf8Span());
+		Assert.Equal("C"u8, FlagsType.C.AsUtf8Span());
+		Assert.Equal("D"u8, FlagsType.D.AsUtf8Span());
+		Assert.Equal("E"u8, FlagsType.E.AsUtf8Span());
+
 		Assert.Equal("A, B"u8, (FlagsType.None | FlagsType.A | FlagsType.B).AsUtf8Span());
 		Assert.Equal("A, B"u8, (FlagsType.A | FlagsType.B).AsUtf8Span());
 		Assert.Equal("A, B, C"u8, (FlagsType.A | FlagsType.B | FlagsType.C).AsUtf8Span());
@@ -74,6 +111,36 @@ public sealed class EnumTests
 		Assert.Equal("A, B, C, D, E"u8, (FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).AsUtf8Span());
 		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)32).AsUtf8Span());
 		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)33).AsUtf8Span());
+
+		Assert.Equal("None"u8, FlagsTypeWithMissingBits.None.AsUtf8Span());
+		Assert.Equal("A"u8, FlagsTypeWithMissingBits.A.AsUtf8Span());
+		Assert.Equal("B"u8, FlagsTypeWithMissingBits.B.AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)4).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)5).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)6).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)7).AsUtf8Span());
+		Assert.Equal("D"u8, FlagsTypeWithMissingBits.D.AsUtf8Span());
+		Assert.Equal("E"u8, FlagsTypeWithMissingBits.E.AsUtf8Span());
+
+		Assert.Equal("A, B"u8, (FlagsTypeWithMissingBits.None | FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span());
+		Assert.Equal("A, B"u8, (FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span());
+		Assert.Equal("B, D"u8, (FlagsTypeWithMissingBits.B | FlagsTypeWithMissingBits.D).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)31).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)32).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsTypeWithMissingBits)33).AsUtf8Span());
+
+		Assert.Equal("No value"u8, NamedFlagsType.None.AsUtf8Span());
+		Assert.Equal("Value A"u8, NamedFlagsType.A.AsUtf8Span());
+		Assert.Equal("Value B"u8, NamedFlagsType.B.AsUtf8Span());
+		Assert.Equal("Value C"u8, NamedFlagsType.C.AsUtf8Span());
+		Assert.Equal("Value D"u8, NamedFlagsType.D.AsUtf8Span());
+		Assert.Equal("Value E"u8, NamedFlagsType.E.AsUtf8Span());
+
+		Assert.Equal("Value A, Value B"u8, (NamedFlagsType.None | NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span());
+		Assert.Equal("Value A, Value B"u8, (NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span());
+		Assert.Equal("Value A, Value B, Value C"u8, (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).AsUtf8Span());
+		Assert.Equal("Value B, Value D"u8, (NamedFlagsType.B | NamedFlagsType.D).AsUtf8Span());
+		Assert.Equal("Value A, Value B, Value C, Value D, Value E"u8, (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).AsUtf8Span());
 	}
 
 	[Fact]
