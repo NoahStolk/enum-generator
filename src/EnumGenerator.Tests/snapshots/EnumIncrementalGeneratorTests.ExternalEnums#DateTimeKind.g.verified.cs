@@ -6,6 +6,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace System;
 
@@ -57,5 +58,15 @@ public static class DateTimeKindGen
 			2 => System.DateTimeKind.Local,
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
+	}
+
+	public static void WriteDateTimeKind(this BinaryWriter writer, System.DateTimeKind value)
+	{
+		writer.Write((int)value);
+	}
+
+	public static System.DateTimeKind ReadDateTimeKind(this BinaryReader reader)
+	{
+		return (System.DateTimeKind)reader.ReadInt32();
 	}
 }

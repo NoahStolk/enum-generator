@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Tests;
 
@@ -44,5 +45,15 @@ internal static class TestEnumGen
 		{
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
+	}
+
+	public static void WriteTestEnum(this BinaryWriter writer, Tests.TestEnum value)
+	{
+		writer.Write((int)value);
+	}
+
+	public static Tests.TestEnum ReadTestEnum(this BinaryReader reader)
+	{
+		return (Tests.TestEnum)reader.ReadInt32();
 	}
 }

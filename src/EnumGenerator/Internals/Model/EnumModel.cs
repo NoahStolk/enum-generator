@@ -15,4 +15,8 @@ internal sealed record EnumModel
 	public required bool HasFlagsAttribute { get; init; }
 
 	public required string? GeneratedClassName { get; init; }
+
+	public required string EnumUnderlyingTypeName { get; init; }
+
+	public required string BinaryReaderMethodName { get; init; }
 }

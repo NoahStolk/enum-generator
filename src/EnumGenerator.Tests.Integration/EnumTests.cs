@@ -101,4 +101,41 @@ public sealed class EnumTests
 		Assert.Equal(FlagsType.D, FlagsTypeGen.FromIndex(4));
 		Assert.Equal(FlagsType.E, FlagsTypeGen.FromIndex(5));
 	}
+
+	[Fact]
+	public void BinarySerializationWorksCorrectly()
+	{
+		using MemoryStream ms = new();
+		using BinaryWriter writer = new(ms);
+		using BinaryReader reader = new(ms);
+
+		RoundTrip<byte, UnderlyingTypedByte>(writer, reader, UnderlyingTypedByte.A, UnderlyingTypedByteGen.WriteUnderlyingTypedByte, UnderlyingTypedByteGen.ReadUnderlyingTypedByte);
+		RoundTrip<ushort, UnderlyingTypedUShort>(writer, reader, UnderlyingTypedUShort.A, UnderlyingTypedUShortGen.WriteUnderlyingTypedUShort, UnderlyingTypedUShortGen.ReadUnderlyingTypedUShort);
+		RoundTrip<uint, UnderlyingTypedUInt>(writer, reader, UnderlyingTypedUInt.A, UnderlyingTypedUIntGen.WriteUnderlyingTypedUInt, UnderlyingTypedUIntGen.ReadUnderlyingTypedUInt);
+		RoundTrip<ulong, UnderlyingTypedULong>(writer, reader, UnderlyingTypedULong.A, UnderlyingTypedULongGen.WriteUnderlyingTypedULong, UnderlyingTypedULongGen.ReadUnderlyingTypedULong);
+		RoundTrip<sbyte, UnderlyingTypedSByte>(writer, reader, UnderlyingTypedSByte.A, UnderlyingTypedSByteGen.WriteUnderlyingTypedSByte, UnderlyingTypedSByteGen.ReadUnderlyingTypedSByte);
+		RoundTrip<short, UnderlyingTypedShort>(writer, reader, UnderlyingTypedShort.A, UnderlyingTypedShortGen.WriteUnderlyingTypedShort, UnderlyingTypedShortGen.ReadUnderlyingTypedShort);
+		RoundTrip<int, UnderlyingTypedInt>(writer, reader, UnderlyingTypedInt.A, UnderlyingTypedIntGen.WriteUnderlyingTypedInt, UnderlyingTypedIntGen.ReadUnderlyingTypedInt);
+		RoundTrip<long, UnderlyingTypedLong>(writer, reader, UnderlyingTypedLong.A, UnderlyingTypedLongGen.WriteUnderlyingTypedLong, UnderlyingTypedLongGen.ReadUnderlyingTypedLong);
+	}
+
+	private static unsafe void RoundTrip<TPrimitive, TEnum>(
+		BinaryWriter writer,
+		BinaryReader reader,
+		TEnum value,
+		Action<BinaryWriter, TEnum> writeFunc,
+		Func<BinaryReader, TEnum> readFunc)
+		where TPrimitive : unmanaged
+		where TEnum : struct, Enum
+	{
+		writer.BaseStream.Position = 0;
+		writeFunc(writer, value);
+		Assert.Equal(sizeof(TPrimitive), writer.BaseStream.Position);
+
+		writer.BaseStream.Position = 0;
+		TEnum result = readFunc(reader);
+		Assert.Equal(sizeof(TPrimitive), writer.BaseStream.Position);
+
+		Assert.Equal(value, result);
+	}
 }

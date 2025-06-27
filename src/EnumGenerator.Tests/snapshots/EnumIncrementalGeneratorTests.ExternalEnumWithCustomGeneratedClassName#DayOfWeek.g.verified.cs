@@ -6,6 +6,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace System;
 
@@ -73,5 +74,15 @@ public static class DayOfWeekGeneratedUtilities
 			6 => System.DayOfWeek.Saturday,
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
+	}
+
+	public static void WriteDayOfWeek(this BinaryWriter writer, System.DayOfWeek value)
+	{
+		writer.Write((int)value);
+	}
+
+	public static System.DayOfWeek ReadDayOfWeek(this BinaryReader reader)
+	{
+		return (System.DayOfWeek)reader.ReadInt32();
 	}
 }

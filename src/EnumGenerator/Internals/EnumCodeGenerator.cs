@@ -37,6 +37,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		CodeWriter writer = new();
 		AddUsingIfNeeded(writer, "System");
 		AddUsingIfNeeded(writer, "System.Collections.Generic");
+		AddUsingIfNeeded(writer, "System.IO");
 		writer.WriteLine();
 		writer.WriteLine($"namespace {enumModel.NamespaceName};");
 		writer.WriteLine();
@@ -101,6 +102,18 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),");
 		writer.EndBlockWithSemicolon();
+		writer.EndBlock();
+
+		writer.WriteLine();
+		writer.WriteLine($"public static void Write{enumModel.EnumName}(this BinaryWriter writer, {enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		writer.WriteLine($"writer.Write(({enumModel.EnumUnderlyingTypeName})value);");
+		writer.EndBlock();
+
+		writer.WriteLine();
+		writer.WriteLine($"public static {enumModel.EnumTypeName} Read{enumModel.EnumName}(this BinaryReader reader)");
+		writer.StartBlock();
+		writer.WriteLine($"return ({enumModel.EnumTypeName})reader.{enumModel.BinaryReaderMethodName}();");
 		writer.EndBlock();
 
 		if (enumModel.HasFlagsAttribute)

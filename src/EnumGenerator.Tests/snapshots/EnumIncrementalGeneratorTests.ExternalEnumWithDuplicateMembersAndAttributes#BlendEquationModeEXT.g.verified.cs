@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Silk.NET.OpenGL;
 
@@ -74,5 +75,15 @@ public static class BlendEquationModeEXTGen
 			6 => Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix,
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
+	}
+
+	public static void WriteBlendEquationModeEXT(this BinaryWriter writer, Silk.NET.OpenGL.BlendEquationModeEXT value)
+	{
+		writer.Write((int)value);
+	}
+
+	public static Silk.NET.OpenGL.BlendEquationModeEXT ReadBlendEquationModeEXT(this BinaryReader reader)
+	{
+		return (Silk.NET.OpenGL.BlendEquationModeEXT)reader.ReadInt32();
 	}
 }

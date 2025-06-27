@@ -53,35 +53,16 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 			if (attribute.AttributeClass is not { Name: "GenerateEnumUtilitiesAttribute", IsGenericType: true })
 				continue;
 
-			ITypeSymbol enumType = attribute.AttributeClass.TypeArguments[0];
-			if (enumType.TypeKind != TypeKind.Enum)
+			ITypeSymbol enumTypeSymbol = attribute.AttributeClass.TypeArguments[0];
+			if (enumTypeSymbol.TypeKind != TypeKind.Enum)
+				continue;
+
+			if (enumTypeSymbol is not INamedTypeSymbol namedTypeSymbol)
 				continue;
 
 			string? generatedClassName = attribute.NamedArguments.FirstOrDefault(kvp => kvp.Key == "GeneratedClassName").Value.Value?.ToString();
 
-			enumModels.Add(new EnumModel
-			{
-				EnumName = enumType.Name,
-				EnumTypeName = enumType.ToDisplayString(),
-				NamespaceName = enumType.ContainingNamespace.ToDisplayString(),
-				Accessibility = "public",
-				Members = enumType
-					.GetMembers()
-					.Where(m => m.Kind == SymbolKind.Field)
-					.Select(m =>
-					{
-						IFieldSymbol fieldSymbol = (IFieldSymbol)m;
-						return new EnumMemberModel
-						{
-							ConstantValue = fieldSymbol.ConstantValue?.ToString(),
-							Name = m.Name,
-							DisplayName = m.Name,
-						};
-					})
-					.ToList(),
-				HasFlagsAttribute = enumType.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
-				GeneratedClassName = generatedClassName,
-			});
+			enumModels.Add(EnumModelBuilder.BuildFromCompilation(enumTypeSymbol, generatedClassName, namedTypeSymbol));
 		}
 
 		return enumModels;

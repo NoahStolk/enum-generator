@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Tests;
 
@@ -74,5 +75,15 @@ public static class BlendEquationModeEXTGen
 			6 => Tests.BlendEquationModeEXT.AlphaMaxSgix,
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
+	}
+
+	public static void WriteBlendEquationModeEXT(this BinaryWriter writer, Tests.BlendEquationModeEXT value)
+	{
+		writer.Write((int)value);
+	}
+
+	public static Tests.BlendEquationModeEXT ReadBlendEquationModeEXT(this BinaryReader reader)
+	{
+		return (Tests.BlendEquationModeEXT)reader.ReadInt32();
 	}
 }
