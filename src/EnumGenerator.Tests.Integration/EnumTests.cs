@@ -34,6 +34,22 @@ public sealed class EnumTests
 
 		Assert.Equal("Sunday", DayOfWeek.Sunday.ToStringFast());
 		Assert.Equal("Unspecified", DateTimeKind.Unspecified.ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((DateTimeKind)3).ToStringFast());
+
+		Assert.Equal("None", FlagsType.None.ToStringFast());
+		Assert.Equal("A", FlagsType.A.ToStringFast());
+		Assert.Equal("B", FlagsType.B.ToStringFast());
+		Assert.Equal("C", FlagsType.C.ToStringFast());
+		Assert.Equal("D", FlagsType.D.ToStringFast());
+		Assert.Equal("E", FlagsType.E.ToStringFast());
+
+		Assert.Equal("A, B", (FlagsType.None | FlagsType.A | FlagsType.B).ToStringFast());
+		Assert.Equal("A, B", (FlagsType.A | FlagsType.B).ToStringFast());
+		Assert.Equal("A, B, C", (FlagsType.A | FlagsType.B | FlagsType.C).ToStringFast());
+		Assert.Equal("B, D", (FlagsType.B | FlagsType.D).ToStringFast());
+		Assert.Equal("A, B, C, D, E", (FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)32).ToStringFast());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)33).ToStringFast());
 	}
 
 	[Fact]
@@ -49,6 +65,15 @@ public sealed class EnumTests
 
 		Assert.True("Sunday"u8.SequenceEqual(DayOfWeek.Sunday.AsUtf8Span()));
 		Assert.True("Unspecified"u8.SequenceEqual(DateTimeKind.Unspecified.AsUtf8Span()));
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((DateTimeKind)3).AsUtf8Span());
+
+		Assert.Equal("A, B"u8, (FlagsType.None | FlagsType.A | FlagsType.B).AsUtf8Span());
+		Assert.Equal("A, B"u8, (FlagsType.A | FlagsType.B).AsUtf8Span());
+		Assert.Equal("A, B, C"u8, (FlagsType.A | FlagsType.B | FlagsType.C).AsUtf8Span());
+		Assert.Equal("B, D"u8, (FlagsType.B | FlagsType.D).AsUtf8Span());
+		Assert.Equal("A, B, C, D, E"u8, (FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)32).AsUtf8Span());
+		Assert.Throws<ArgumentOutOfRangeException>(() => ((FlagsType)33).AsUtf8Span());
 	}
 
 	[Fact]

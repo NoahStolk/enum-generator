@@ -382,4 +382,45 @@ public sealed class EnumIncrementalGeneratorTests
 
 		await TestHelper.Verify(code);
 	}
+
+	[Fact]
+	public async Task ComplexFlagsEnum()
+	{
+		const string code =
+			"""
+			using System;
+			using EnumGenerator;
+			namespace Tests;
+			[Flags]
+			[GenerateEnumUtilities]
+			public enum TestEnum : ushort
+			{
+				None = 0,
+
+				Entry1 = 0b0000_0001,
+				Entry2 = 0b0000_0010,
+				Entry3 = 0b0000_0100,
+				Entry4 = 0b0000_1000,
+
+				// Bit 5 intentionally left empty.
+				Option1 = 0b0010_0000,
+				Option2 = 0b0100_0000,
+				Option3 = 0b1000_0000,
+
+				Option4 = 0b0000_1000_0000_0000,
+
+				Option1Alias1 = 0b0010_0000,
+				Option1Alias2 = Option1Alias1,
+				Option1Alias3 = 0x20,
+				Option1Alias4 = 32,
+
+				Entry1And2 = Entry1 | Entry2,
+				Entry3And4 = Entry3 | Entry4,
+				Entry1And3 = Entry1 | Entry3,
+				Entry2And4 = Entry2 | Entry4,
+			}
+			""";
+
+		await TestHelper.Verify(code);
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using EnumGenerator.Internals.Model;
 using EnumGenerator.Internals.Utils;
+using System.Numerics;
 
 namespace EnumGenerator.Internals;
 
@@ -25,13 +26,15 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 
 	public string Generate()
 	{
+		// Filter out duplicate members.
 		List<EnumMemberModel> relevantMembers = [];
-		foreach (EnumMemberModel member in enumModel.Members)
-		{
-			if (member.ConstantValue != null && relevantMembers.Any(m => m.ConstantValue == member.ConstantValue))
-				continue;
+		relevantMembers.AddRange(enumModel.Members.Where(member => relevantMembers.All(m => m.ConstantValue != member.ConstantValue)));
 
-			relevantMembers.Add(member);
+		Dictionary<BigInteger, string> flagValues = [];
+		if (enumModel.HasFlagsAttribute)
+		{
+			flagValues = GetFlagValues(relevantMembers);
+			relevantMembers = relevantMembers.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue)).ToList();
 		}
 
 		CodeWriter writer = new();
@@ -60,6 +63,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		foreach (EnumMemberModel member in relevantMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\",");
+		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
+			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\",");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
@@ -70,6 +75,8 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		foreach (EnumMemberModel member in relevantMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
+		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
+			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\"u8,");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
@@ -128,5 +135,41 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlock();
 
 		return writer.ToString();
+	}
+
+	private static Dictionary<BigInteger, string> GetFlagValues(List<EnumMemberModel> enumValues)
+	{
+		List<EnumMemberModel> flagValues = enumValues
+			.Where(v => v.ConstantValue == 0 || IsPowerOfTwo(v.ConstantValue))
+			.ToList();
+
+		Dictionary<BigInteger, string> combinations = new();
+		int count = flagValues.Count;
+		for (int i = 0; i < 1 << count; i++)
+		{
+			BigInteger value = 0;
+			List<string> parts = [];
+			for (int j = 0; j < count; j++)
+			{
+				if (((i >> j) & 1) == 0)
+					continue;
+
+				BigInteger val = flagValues[j].ConstantValue;
+				if (val == 0)
+					continue;
+
+				value |= val;
+				parts.Add(enumValues.Find(v => v.ConstantValue == val).DisplayName);
+			}
+
+			combinations[value] = string.Join(", ", parts);
+		}
+
+		return combinations.Where(kvp => kvp.Key != 0 && !IsPowerOfTwo(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+	}
+
+	private static bool IsPowerOfTwo(BigInteger value)
+	{
+		return value != 0 && (value & (value - 1)) == 0;
 	}
 }
