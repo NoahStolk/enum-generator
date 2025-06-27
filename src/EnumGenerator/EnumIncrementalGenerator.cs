@@ -62,7 +62,7 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 
 			string? generatedClassName = attribute.NamedArguments.FirstOrDefault(kvp => kvp.Key == "GeneratedClassName").Value.Value?.ToString();
 
-			enumModels.Add(EnumModelBuilder.BuildFromCompilation(enumTypeSymbol, generatedClassName, namedTypeSymbol));
+			enumModels.Add(EnumModelBuilder.BuildFromCompilation(generatedClassName, namedTypeSymbol));
 		}
 
 		return enumModels;

@@ -334,6 +334,14 @@ public sealed class EnumIncrementalGeneratorTests
 			  	Member0Ext = 0x00,
 			  	Member1 = 1,
 			  	Member1Ext = 0x01,
+
+			  	Member2 = 2,
+			  	Member3 = Member2 + Member1,
+			  	Member4 = Member2 + 2,
+			  	Member4Ext = Member2 + 0x02,
+
+			  	Member5 = 0b0001_0000,
+			  	Member6 = 0b0000_1000 + Member1Ext + 0x1,
 			  }
 			  """;
 

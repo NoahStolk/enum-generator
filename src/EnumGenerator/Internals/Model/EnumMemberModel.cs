@@ -1,8 +1,10 @@
-﻿namespace EnumGenerator.Internals.Model;
+﻿using System.Numerics;
+
+namespace EnumGenerator.Internals.Model;
 
 internal sealed record EnumMemberModel
 {
-	public required string? ConstantValue { get; init; }
+	public required BigInteger ConstantValue { get; init; }
 
 	public required string Name { get; init; }
 

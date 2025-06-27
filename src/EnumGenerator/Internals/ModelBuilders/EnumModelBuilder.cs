@@ -35,36 +35,42 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 			{
 				Name = member.Identifier.Text,
 				DisplayName = displayName,
-				ConstantValue = member.GetConstantValue(),
+				ConstantValue = member.GetEnumConstantValue(semanticModel),
 			});
 		}
 
 		return memberNames;
 	}
 
-	public static EnumModel BuildFromCompilation(ITypeSymbol enumTypeSymbol, string? generatedClassName, INamedTypeSymbol namedTypeSymbol)
+	public static EnumModel BuildFromCompilation(string? generatedClassName, INamedTypeSymbol namedTypeSymbol)
 	{
 		return new EnumModel
 		{
-			EnumName = enumTypeSymbol.Name,
-			EnumTypeName = enumTypeSymbol.ToDisplayString(),
-			NamespaceName = enumTypeSymbol.ContainingNamespace.ToDisplayString(),
+			EnumName = namedTypeSymbol.Name,
+			EnumTypeName = namedTypeSymbol.ToDisplayString(),
+			NamespaceName = namedTypeSymbol.ContainingNamespace.ToDisplayString(),
 			Accessibility = "public",
-			Members = enumTypeSymbol
+			Members = namedTypeSymbol
 				.GetMembers()
-				.Where(m => m.Kind == SymbolKind.Field)
+				.OfType<IFieldSymbol>()
+
+				// Note; this "Where" doesn't skip implicitly defined members, as they do technically have a constant value.
+				// We only do this to skip fields such as the enum's backing field "value__".
+				.Where(f => f.HasConstantValue)
 				.Select(m =>
 				{
-					IFieldSymbol fieldSymbol = (IFieldSymbol)m;
+					if (m.ConstantValue == null)
+						throw new InvalidOperationException($"Fields without a constant value should have been filtered out. Could not get constant value for '{m.Name}'.");
+
 					return new EnumMemberModel
 					{
-						ConstantValue = fieldSymbol.ConstantValue?.ToString(),
+						ConstantValue = EnumMemberDeclarationSyntaxExtensions.AsBigInteger(m.ConstantValue),
 						Name = m.Name,
 						DisplayName = m.Name,
 					};
 				})
 				.ToList(),
-			HasFlagsAttribute = enumTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
+			HasFlagsAttribute = namedTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
 			GeneratedClassName = generatedClassName,
 			EnumUnderlyingTypeName = GetEnumUnderlyingTypeString(namedTypeSymbol.EnumUnderlyingType),
 			BinaryReaderMethodName = GetBinaryReaderMethodName(namedTypeSymbol.EnumUnderlyingType),

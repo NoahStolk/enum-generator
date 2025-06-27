@@ -15,7 +15,7 @@ public static class TestEnumGen
 {
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
-	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Member0\0Member1\0"u8;
+	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Member0\0Member1\0Member2\0Member3\0Member4\0Member5\0Member6\0"u8;
 
 	public static string ToStringFast(this Tests.TestEnum value)
 	{
@@ -23,6 +23,11 @@ public static class TestEnumGen
 		{
 			Tests.TestEnum.Member0 => "Member0",
 			Tests.TestEnum.Member1 => "Member1",
+			Tests.TestEnum.Member2 => "Member2",
+			Tests.TestEnum.Member3 => "Member3",
+			Tests.TestEnum.Member4 => "Member4",
+			Tests.TestEnum.Member5 => "Member5",
+			Tests.TestEnum.Member6 => "Member6",
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
@@ -33,6 +38,11 @@ public static class TestEnumGen
 		{
 			Tests.TestEnum.Member0 => "Member0"u8,
 			Tests.TestEnum.Member1 => "Member1"u8,
+			Tests.TestEnum.Member2 => "Member2"u8,
+			Tests.TestEnum.Member3 => "Member3"u8,
+			Tests.TestEnum.Member4 => "Member4"u8,
+			Tests.TestEnum.Member5 => "Member5"u8,
+			Tests.TestEnum.Member6 => "Member6"u8,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
@@ -43,6 +53,11 @@ public static class TestEnumGen
 		{
 			Tests.TestEnum.Member0 => 0,
 			Tests.TestEnum.Member1 => 1,
+			Tests.TestEnum.Member2 => 2,
+			Tests.TestEnum.Member3 => 3,
+			Tests.TestEnum.Member4 => 4,
+			Tests.TestEnum.Member5 => 5,
+			Tests.TestEnum.Member6 => 6,
 			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
 		};
 	}
@@ -53,6 +68,11 @@ public static class TestEnumGen
 		{
 			0 => Tests.TestEnum.Member0,
 			1 => Tests.TestEnum.Member1,
+			2 => Tests.TestEnum.Member2,
+			3 => Tests.TestEnum.Member3,
+			4 => Tests.TestEnum.Member4,
+			5 => Tests.TestEnum.Member5,
+			6 => Tests.TestEnum.Member6,
 			_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
 		};
 	}
