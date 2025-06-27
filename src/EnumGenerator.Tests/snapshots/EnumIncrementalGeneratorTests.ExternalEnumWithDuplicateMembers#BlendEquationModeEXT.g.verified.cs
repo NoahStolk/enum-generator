@@ -77,7 +77,7 @@ public static class BlendEquationModeEXTGen
 		};
 	}
 
-	public static void WriteBlendEquationModeEXT(this BinaryWriter writer, Tests.BlendEquationModeEXT value)
+	public static void Write(this BinaryWriter writer, Tests.BlendEquationModeEXT value)
 	{
 		writer.Write((int)value);
 	}

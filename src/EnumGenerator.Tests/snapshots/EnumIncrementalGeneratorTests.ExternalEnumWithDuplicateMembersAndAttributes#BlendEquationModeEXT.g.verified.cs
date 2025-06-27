@@ -77,7 +77,7 @@ public static class BlendEquationModeEXTGen
 		};
 	}
 
-	public static void WriteBlendEquationModeEXT(this BinaryWriter writer, Silk.NET.OpenGL.BlendEquationModeEXT value)
+	public static void Write(this BinaryWriter writer, Silk.NET.OpenGL.BlendEquationModeEXT value)
 	{
 		writer.Write((int)value);
 	}

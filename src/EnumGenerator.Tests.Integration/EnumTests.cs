@@ -134,14 +134,14 @@ public sealed class EnumTests
 		using BinaryWriter writer = new(ms);
 		using BinaryReader reader = new(ms);
 
-		RoundTrip<byte, UnderlyingTypedByte>(writer, reader, UnderlyingTypedByte.A, UnderlyingTypedByteGen.WriteUnderlyingTypedByte, UnderlyingTypedByteGen.ReadUnderlyingTypedByte);
-		RoundTrip<ushort, UnderlyingTypedUShort>(writer, reader, UnderlyingTypedUShort.A, UnderlyingTypedUShortGen.WriteUnderlyingTypedUShort, UnderlyingTypedUShortGen.ReadUnderlyingTypedUShort);
-		RoundTrip<uint, UnderlyingTypedUInt>(writer, reader, UnderlyingTypedUInt.A, UnderlyingTypedUIntGen.WriteUnderlyingTypedUInt, UnderlyingTypedUIntGen.ReadUnderlyingTypedUInt);
-		RoundTrip<ulong, UnderlyingTypedULong>(writer, reader, UnderlyingTypedULong.A, UnderlyingTypedULongGen.WriteUnderlyingTypedULong, UnderlyingTypedULongGen.ReadUnderlyingTypedULong);
-		RoundTrip<sbyte, UnderlyingTypedSByte>(writer, reader, UnderlyingTypedSByte.A, UnderlyingTypedSByteGen.WriteUnderlyingTypedSByte, UnderlyingTypedSByteGen.ReadUnderlyingTypedSByte);
-		RoundTrip<short, UnderlyingTypedShort>(writer, reader, UnderlyingTypedShort.A, UnderlyingTypedShortGen.WriteUnderlyingTypedShort, UnderlyingTypedShortGen.ReadUnderlyingTypedShort);
-		RoundTrip<int, UnderlyingTypedInt>(writer, reader, UnderlyingTypedInt.A, UnderlyingTypedIntGen.WriteUnderlyingTypedInt, UnderlyingTypedIntGen.ReadUnderlyingTypedInt);
-		RoundTrip<long, UnderlyingTypedLong>(writer, reader, UnderlyingTypedLong.A, UnderlyingTypedLongGen.WriteUnderlyingTypedLong, UnderlyingTypedLongGen.ReadUnderlyingTypedLong);
+		RoundTrip<byte, UnderlyingTypedByte>(writer, reader, UnderlyingTypedByte.A, UnderlyingTypedByteGen.Write, UnderlyingTypedByteGen.ReadUnderlyingTypedByte);
+		RoundTrip<ushort, UnderlyingTypedUShort>(writer, reader, UnderlyingTypedUShort.A, UnderlyingTypedUShortGen.Write, UnderlyingTypedUShortGen.ReadUnderlyingTypedUShort);
+		RoundTrip<uint, UnderlyingTypedUInt>(writer, reader, UnderlyingTypedUInt.A, UnderlyingTypedUIntGen.Write, UnderlyingTypedUIntGen.ReadUnderlyingTypedUInt);
+		RoundTrip<ulong, UnderlyingTypedULong>(writer, reader, UnderlyingTypedULong.A, UnderlyingTypedULongGen.Write, UnderlyingTypedULongGen.ReadUnderlyingTypedULong);
+		RoundTrip<sbyte, UnderlyingTypedSByte>(writer, reader, UnderlyingTypedSByte.A, UnderlyingTypedSByteGen.Write, UnderlyingTypedSByteGen.ReadUnderlyingTypedSByte);
+		RoundTrip<short, UnderlyingTypedShort>(writer, reader, UnderlyingTypedShort.A, UnderlyingTypedShortGen.Write, UnderlyingTypedShortGen.ReadUnderlyingTypedShort);
+		RoundTrip<int, UnderlyingTypedInt>(writer, reader, UnderlyingTypedInt.A, UnderlyingTypedIntGen.Write, UnderlyingTypedIntGen.ReadUnderlyingTypedInt);
+		RoundTrip<long, UnderlyingTypedLong>(writer, reader, UnderlyingTypedLong.A, UnderlyingTypedLongGen.Write, UnderlyingTypedLongGen.ReadUnderlyingTypedLong);
 	}
 
 	private static unsafe void RoundTrip<TPrimitive, TEnum>(

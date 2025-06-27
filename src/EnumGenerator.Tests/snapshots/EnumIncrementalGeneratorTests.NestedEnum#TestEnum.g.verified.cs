@@ -47,7 +47,7 @@ internal static class TestEnumGen
 		};
 	}
 
-	public static void WriteTestEnum(this BinaryWriter writer, Tests.TestClass.TestEnum value)
+	public static void Write(this BinaryWriter writer, Tests.TestClass.TestEnum value)
 	{
 		writer.Write((int)value);
 	}

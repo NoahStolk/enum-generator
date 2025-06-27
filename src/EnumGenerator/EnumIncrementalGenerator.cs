@@ -72,8 +72,17 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 	{
 		foreach (EnumModel enumModel in enumModels)
 		{
-			EnumCodeGenerator codeGenerator = new(enumModel);
-			string sourceCode = SourceBuilderUtils.Build(codeGenerator.Generate());
+			string sourceCode;
+			if (enumModel.HasFlagsAttribute)
+			{
+				FlagsEnumCodeGenerator codeGenerator = new(enumModel);
+				sourceCode = SourceBuilderUtils.Build(codeGenerator.Generate());
+			}
+			else
+			{
+				EnumCodeGenerator codeGenerator = new(enumModel);
+				sourceCode = SourceBuilderUtils.Build(codeGenerator.Generate());
+			}
 
 			context.AddSource($"{enumModel.EnumName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
 		}

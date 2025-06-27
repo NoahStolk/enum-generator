@@ -1,82 +1,40 @@
-﻿using EnumGenerator.Internals.Model;
+﻿using EnumGenerator.Internals.Extensions;
+using EnumGenerator.Internals.Model;
 using EnumGenerator.Internals.Utils;
-using System.Numerics;
 
 namespace EnumGenerator.Internals;
 
 internal sealed class EnumCodeGenerator(EnumModel enumModel)
 {
-	private void AddUsingIfNeeded(CodeWriter writer, string usingNamespace)
-	{
-		if (enumModel.NamespaceName == usingNamespace)
-			return;
-
-		writer.WriteLine($"using {usingNamespace};");
-	}
-
-	private string GetClassName()
-	{
-		// TODO: Maybe also check if GeneratedClassName is a valid C# identifier.
-		if (string.IsNullOrWhiteSpace(enumModel.GeneratedClassName))
-			return $"{enumModel.EnumName}Gen";
-
-		// ! IsNullOrWhiteSpace is not annotated in .NET Standard 2.0.
-		return enumModel.GeneratedClassName!;
-	}
-
 	public string Generate()
 	{
-		// Filter out duplicate members.
-		List<EnumMemberModel> relevantMembers = [];
-		relevantMembers.AddRange(enumModel.Members.Where(member => relevantMembers.All(m => m.ConstantValue != member.ConstantValue)));
-
-		Dictionary<BigInteger, string> flagValues = [];
 		if (enumModel.HasFlagsAttribute)
-		{
-			flagValues = GetFlagValues(relevantMembers);
-			relevantMembers = relevantMembers.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue)).ToList();
-		}
+			throw new NotSupportedException("Flags enums are not supported. Use the FlagEnumCodeGenerator instead.");
 
-		int bitCount = enumModel.EnumUnderlyingTypeName switch
-		{
-			"byte" or "sbyte" => 8,
-			"short" or "ushort" => 16,
-			"int" or "uint" => 32,
-			"long" or "ulong" => 64,
-			_ => throw new InvalidOperationException($"Unsupported enum underlying type: {enumModel.EnumUnderlyingTypeName}"),
-		};
-		bool isExhaustive = relevantMembers.Count + flagValues.Count == (int)Math.Pow(2, bitCount);
+		List<EnumMemberModel> uniqueMembers = enumModel.Members.DistinctBy(m => m.ConstantValue).ToList();
 
 		CodeWriter writer = new();
-		AddUsingIfNeeded(writer, "System");
-		AddUsingIfNeeded(writer, "System.Collections.Generic");
-		AddUsingIfNeeded(writer, "System.IO");
+		writer.AddUsingIfNeeded(enumModel, "System");
+		writer.AddUsingIfNeeded(enumModel, "System.Collections.Generic");
+		writer.AddUsingIfNeeded(enumModel, "System.IO");
 		writer.WriteLine();
 		writer.WriteLine($"namespace {enumModel.NamespaceName};");
 		writer.WriteLine();
-		writer.WriteLine($"{enumModel.Accessibility} static class {GetClassName()}");
+		writer.WriteLine($"{enumModel.Accessibility} static class {enumModel.GetClassName()}");
 		writer.StartBlock();
 
-		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumTypeName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumTypeName}}>();""");
+		writer.GenerateValuesProperty(enumModel);
 		writer.WriteLine();
 
-		if (relevantMembers.Count > 0)
-		{
-			string nullTerminatedMemberNames = string.Concat(relevantMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
-			writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
-			writer.WriteLine();
-		}
+		writer.GenerateNullTerminatedMemberNamesProperty(uniqueMembers);
 
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in relevantMembers)
+		foreach (EnumMemberModel member in uniqueMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\",");
-		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
-			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\",");
-		if (!isExhaustive)
-			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 		writer.WriteLine();
@@ -84,104 +42,26 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in relevantMembers)
+		foreach (EnumMemberModel member in uniqueMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
-		foreach (KeyValuePair<BigInteger, string> flagKvp in flagValues)
-			writer.WriteLine($"({enumModel.EnumTypeName}){flagKvp.Key} => \"{flagKvp.Value}\"u8,");
-		if (!isExhaustive)
-			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
-		writer.EndBlockWithSemicolon();
-		writer.EndBlock();
-
-		writer.WriteLine();
-		writer.WriteLine($"public static int GetIndex(this {enumModel.EnumTypeName} value)");
-		writer.StartBlock();
-		writer.WriteLine("return value switch");
-		writer.StartBlock();
-		for (int i = 0; i < relevantMembers.Count; i++)
-		{
-			EnumMemberModel member = relevantMembers[i];
-			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => {i},");
-		}
-
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
-
 		writer.WriteLine();
-		writer.WriteLine($"public static {enumModel.EnumTypeName} FromIndex(int index)");
-		writer.StartBlock();
-		writer.WriteLine("return index switch");
-		writer.StartBlock();
-		for (int i = 0; i < relevantMembers.Count; i++)
-		{
-			EnumMemberModel member = relevantMembers[i];
-			writer.WriteLine($"{i} => {enumModel.EnumTypeName}.{member.Name},");
-		}
 
-		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),");
-		writer.EndBlockWithSemicolon();
-		writer.EndBlock();
-
+		writer.GenerateGetIndexMethod(enumModel, uniqueMembers);
 		writer.WriteLine();
-		writer.WriteLine($"public static void Write{enumModel.EnumName}(this BinaryWriter writer, {enumModel.EnumTypeName} value)");
-		writer.StartBlock();
-		writer.WriteLine($"writer.Write(({enumModel.EnumUnderlyingTypeName})value);");
-		writer.EndBlock();
 
+		writer.GenerateFromIndexMethod(enumModel, uniqueMembers);
 		writer.WriteLine();
-		writer.WriteLine($"public static {enumModel.EnumTypeName} Read{enumModel.EnumName}(this BinaryReader reader)");
-		writer.StartBlock();
-		writer.WriteLine($"return ({enumModel.EnumTypeName})reader.{enumModel.BinaryReaderMethodName}();");
-		writer.EndBlock();
 
-		if (enumModel.HasFlagsAttribute)
-		{
-			writer.WriteLine();
-			writer.WriteLine($"public static bool HasFlagFast(this {enumModel.EnumTypeName} value, {enumModel.EnumTypeName} flag)");
-			writer.StartBlock();
-			writer.WriteLine("return (value & flag) != 0;");
-			writer.EndBlock();
-		}
+		writer.GenerateWriteMethod(enumModel);
+		writer.WriteLine();
+
+		writer.GenerateReadMethod(enumModel);
 
 		writer.EndBlock();
 
 		return writer.ToString();
-	}
-
-	private static Dictionary<BigInteger, string> GetFlagValues(List<EnumMemberModel> enumValues)
-	{
-		List<EnumMemberModel> flagValues = enumValues
-			.Where(v => v.ConstantValue == 0 || IsPowerOfTwo(v.ConstantValue))
-			.ToList();
-
-		Dictionary<BigInteger, string> combinations = new();
-		int count = flagValues.Count;
-		for (int i = 0; i < 1 << count; i++)
-		{
-			BigInteger value = 0;
-			List<string> parts = [];
-			for (int j = 0; j < count; j++)
-			{
-				if (((i >> j) & 1) == 0)
-					continue;
-
-				BigInteger val = flagValues[j].ConstantValue;
-				if (val == 0)
-					continue;
-
-				value |= val;
-				parts.Add(enumValues.Find(v => v.ConstantValue == val).DisplayName);
-			}
-
-			combinations[value] = string.Join(", ", parts);
-		}
-
-		return combinations.Where(kvp => kvp.Key != 0 && !IsPowerOfTwo(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-	}
-
-	private static bool IsPowerOfTwo(BigInteger value)
-	{
-		return value != 0 && (value & (value - 1)) == 0;
 	}
 }

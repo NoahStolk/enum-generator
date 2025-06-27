@@ -76,7 +76,7 @@ public static class DayOfWeekGen
 		};
 	}
 
-	public static void WriteDayOfWeek(this BinaryWriter writer, System.DayOfWeek value)
+	public static void Write(this BinaryWriter writer, System.DayOfWeek value)
 	{
 		writer.Write((int)value);
 	}

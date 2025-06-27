@@ -577,7 +577,7 @@ public static class IndicesGen
 		};
 	}
 
-	public static void WriteIndices(this BinaryWriter writer, Tests.Indices value)
+	public static void Write(this BinaryWriter writer, Tests.Indices value)
 	{
 		writer.Write((byte)value);
 	}

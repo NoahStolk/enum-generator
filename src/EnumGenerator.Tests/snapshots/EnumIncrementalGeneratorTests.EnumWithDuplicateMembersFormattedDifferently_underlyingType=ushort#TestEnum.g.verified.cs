@@ -77,7 +77,7 @@ public static class TestEnumGen
 		};
 	}
 
-	public static void WriteTestEnum(this BinaryWriter writer, Tests.TestEnum value)
+	public static void Write(this BinaryWriter writer, Tests.TestEnum value)
 	{
 		writer.Write((ushort)value);
 	}

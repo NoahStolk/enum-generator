@@ -60,7 +60,7 @@ public static class DateTimeKindGen
 		};
 	}
 
-	public static void WriteDateTimeKind(this BinaryWriter writer, System.DateTimeKind value)
+	public static void Write(this BinaryWriter writer, System.DateTimeKind value)
 	{
 		writer.Write((int)value);
 	}
