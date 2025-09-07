@@ -38,12 +38,24 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 		writer.WriteLine();
+
 		writer.WriteLine($"public static ReadOnlySpan<byte> AsUtf8Span(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
 		foreach (EnumMemberModel member in uniqueMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
+		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+		writer.EndBlockWithSemicolon();
+		writer.EndBlock();
+		writer.WriteLine();
+
+		writer.WriteLine($"public static {enumModel.EnumTypeName} FromStringFast(string value)");
+		writer.StartBlock();
+		writer.WriteLine("return value switch");
+		writer.StartBlock();
+		foreach (EnumMemberModel member in uniqueMembers)
+			writer.WriteLine($"\"{member.DisplayName}\" => {enumModel.EnumTypeName}.{member.Name},");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();

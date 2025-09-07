@@ -46,6 +46,21 @@ public static class DayOfWeekGen
 		};
 	}
 
+	public static System.DayOfWeek FromStringFast(string value)
+	{
+		return value switch
+		{
+			"Sunday" => System.DayOfWeek.Sunday,
+			"Monday" => System.DayOfWeek.Monday,
+			"Tuesday" => System.DayOfWeek.Tuesday,
+			"Wednesday" => System.DayOfWeek.Wednesday,
+			"Thursday" => System.DayOfWeek.Thursday,
+			"Friday" => System.DayOfWeek.Friday,
+			"Saturday" => System.DayOfWeek.Saturday,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this System.DayOfWeek value)
 	{
 		return value switch

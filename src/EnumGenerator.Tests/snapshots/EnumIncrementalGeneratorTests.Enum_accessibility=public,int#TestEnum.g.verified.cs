@@ -45,6 +45,20 @@ public static class TestEnumGen
 		};
 	}
 
+	public static Tests.TestEnum FromStringFast(string value)
+	{
+		return value switch
+		{
+			"None" => Tests.TestEnum.None,
+			"First" => Tests.TestEnum.First,
+			"Second" => Tests.TestEnum.Second,
+			"Third" => Tests.TestEnum.Third,
+			"Fourth" => Tests.TestEnum.Fourth,
+			"Fifth" => Tests.TestEnum.Fifth,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Tests.TestEnum value)
 	{
 		return value switch

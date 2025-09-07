@@ -37,6 +37,16 @@ internal static class TestEnumGen
 		};
 	}
 
+	public static Tests.TestEnum FromStringFast(string value)
+	{
+		return value switch
+		{
+			"C#" => Tests.TestEnum.CSharp,
+			"C++" => Tests.TestEnum.CPlusPlus,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Tests.TestEnum value)
 	{
 		return value switch

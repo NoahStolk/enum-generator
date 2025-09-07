@@ -38,6 +38,17 @@ public static class DateTimeKindGen
 		};
 	}
 
+	public static System.DateTimeKind FromStringFast(string value)
+	{
+		return value switch
+		{
+			"Unspecified" => System.DateTimeKind.Unspecified,
+			"Utc" => System.DateTimeKind.Utc,
+			"Local" => System.DateTimeKind.Local,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this System.DateTimeKind value)
 	{
 		return value switch

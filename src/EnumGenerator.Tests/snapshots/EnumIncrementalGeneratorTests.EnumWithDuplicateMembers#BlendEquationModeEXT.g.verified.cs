@@ -47,6 +47,21 @@ public static class BlendEquationModeEXTGen
 		};
 	}
 
+	public static Tests.BlendEquationModeEXT FromStringFast(string value)
+	{
+		return value switch
+		{
+			"FuncAdd" => Tests.BlendEquationModeEXT.FuncAdd,
+			"Min" => Tests.BlendEquationModeEXT.Min,
+			"Max" => Tests.BlendEquationModeEXT.Max,
+			"FuncSubtract" => Tests.BlendEquationModeEXT.FuncSubtract,
+			"FuncReverseSubtract" => Tests.BlendEquationModeEXT.FuncReverseSubtract,
+			"AlphaMinSgix" => Tests.BlendEquationModeEXT.AlphaMinSgix,
+			"AlphaMaxSgix" => Tests.BlendEquationModeEXT.AlphaMaxSgix,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Tests.BlendEquationModeEXT value)
 	{
 		return value switch

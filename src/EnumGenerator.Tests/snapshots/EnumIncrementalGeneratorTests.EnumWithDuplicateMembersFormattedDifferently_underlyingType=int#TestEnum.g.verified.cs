@@ -47,6 +47,21 @@ public static class TestEnumGen
 		};
 	}
 
+	public static Tests.TestEnum FromStringFast(string value)
+	{
+		return value switch
+		{
+			"Member0" => Tests.TestEnum.Member0,
+			"Member1" => Tests.TestEnum.Member1,
+			"Member2" => Tests.TestEnum.Member2,
+			"Member3" => Tests.TestEnum.Member3,
+			"Member4" => Tests.TestEnum.Member4,
+			"Member5" => Tests.TestEnum.Member5,
+			"Member6" => Tests.TestEnum.Member6,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Tests.TestEnum value)
 	{
 		return value switch

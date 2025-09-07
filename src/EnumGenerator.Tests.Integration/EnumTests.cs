@@ -144,6 +144,22 @@ public sealed class EnumTests
 	}
 
 	[Fact]
+	public void FromStringFastReturnsCorrectResult()
+	{
+		Assert.Equal(IntegerType.Byte, IntegerTypeGen.FromStringFast("Byte"));
+		Assert.Equal(IntegerType.Short, IntegerTypeGen.FromStringFast("Short"));
+		Assert.Equal(IntegerType.Int, IntegerTypeGen.FromStringFast("Int"));
+		Assert.Equal(IntegerType.Long, IntegerTypeGen.FromStringFast("Long"));
+
+		Assert.Equal(Language.CSharp, LanguageGen.FromStringFast("C#"));
+		Assert.Equal(Language.CPlusPlus, LanguageGen.FromStringFast("C++"));
+
+		Assert.Equal(DayOfWeek.Sunday, DayOfWeekGen.FromStringFast("Sunday"));
+		Assert.Equal(DateTimeKind.Unspecified, DateTimeKindGen.FromStringFast("Unspecified"));
+		Assert.Throws<ArgumentOutOfRangeException>(() => DateTimeKindGen.FromStringFast("Invalid"));
+	}
+
+	[Fact]
 	public void HasFlagFastReturnsCorrectResult()
 	{
 		const FlagsType ab = FlagsType.A | FlagsType.B;

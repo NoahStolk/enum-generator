@@ -47,6 +47,21 @@ public static class BlendEquationModeEXTGen
 		};
 	}
 
+	public static Silk.NET.OpenGL.BlendEquationModeEXT FromStringFast(string value)
+	{
+		return value switch
+		{
+			"FuncAdd" => Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd,
+			"Min" => Silk.NET.OpenGL.BlendEquationModeEXT.Min,
+			"Max" => Silk.NET.OpenGL.BlendEquationModeEXT.Max,
+			"FuncSubtract" => Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract,
+			"FuncReverseSubtract" => Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract,
+			"AlphaMinSgix" => Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix,
+			"AlphaMaxSgix" => Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix,
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Silk.NET.OpenGL.BlendEquationModeEXT value)
 	{
 		return value switch

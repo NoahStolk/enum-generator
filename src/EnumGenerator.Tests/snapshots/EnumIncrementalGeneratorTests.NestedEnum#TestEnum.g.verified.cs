@@ -31,6 +31,14 @@ internal static class TestEnumGen
 		};
 	}
 
+	public static Tests.TestClass.TestEnum FromStringFast(string value)
+	{
+		return value switch
+		{
+			_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+		};
+	}
+
 	public static int GetIndex(this Tests.TestClass.TestEnum value)
 	{
 		return value switch
