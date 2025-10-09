@@ -125,21 +125,18 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.GenerateReadMethod(enumModel);
 
-		if (enumModel.HasFlagsAttribute)
-		{
-			writer.WriteLine();
-			writer.WriteLine($"public static bool HasFlagFast(this {enumModel.EnumTypeName} value, {enumModel.EnumTypeName} flag)");
-			writer.StartBlock();
-			writer.WriteLine("return (value & flag) != 0;");
-			writer.EndBlock();
+		writer.WriteLine();
+		writer.WriteLine($"public static bool HasFlagFast(this {enumModel.EnumTypeName} value, {enumModel.EnumTypeName} flag)");
+		writer.StartBlock();
+		writer.WriteLine("return (value & flag) != 0;");
+		writer.EndBlock();
 
-			writer.WriteLine();
-			writer.WriteLine($"public static bool ContainsDefinedFlagsOnly(this {enumModel.EnumTypeName} value)");
-			writer.StartBlock();
-			writer.WriteLine($"{enumModel.EnumUnderlyingTypeName} raw = ({enumModel.EnumUnderlyingTypeName})value;");
-			writer.WriteLine($"return (raw & ~({enumModel.EnumUnderlyingTypeName})_definedBits) == 0;");
-			writer.EndBlock();
-		}
+		writer.WriteLine();
+		writer.WriteLine($"public static bool ContainsDefinedFlagsOnly(this {enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		writer.WriteLine($"{enumModel.EnumUnderlyingTypeName} raw = ({enumModel.EnumUnderlyingTypeName})value;");
+		writer.WriteLine($"return (raw & ~({enumModel.EnumUnderlyingTypeName})_definedBits) == 0;");
+		writer.EndBlock();
 
 		writer.EndBlock();
 
