@@ -132,4 +132,10 @@ public static class TestEnumGen
 	{
 		return (value & flag) != 0;
 	}
+
+	public static bool ContainsDefinedFlagsOnly(this Tests.TestEnum value)
+	{
+		ushort raw = (ushort)value;
+		return (raw & ~(ushort)_definedBits) == 0;
+	}
 }

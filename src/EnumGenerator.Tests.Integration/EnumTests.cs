@@ -200,6 +200,67 @@ public sealed class EnumTests
 	}
 
 	[Fact]
+	public void ContainsDefinedFlagsOnlyReturnsCorrectResult()
+	{
+		// Test with FlagsType enum (1, 2, 4, 8, 16)
+		Assert.True(FlagsType.None.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsType.A.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsType.B.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsType.C.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsType.D.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsType.E.ContainsDefinedFlagsOnly());
+
+		// Test with valid combinations
+		Assert.True((FlagsType.A | FlagsType.B).ContainsDefinedFlagsOnly());
+		Assert.True((FlagsType.A | FlagsType.B | FlagsType.C).ContainsDefinedFlagsOnly());
+		Assert.True((FlagsType.B | FlagsType.D).ContainsDefinedFlagsOnly());
+		Assert.True((FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).ContainsDefinedFlagsOnly());
+
+		// Test with undefined flags
+		Assert.False(((FlagsType)32).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsType)33).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsType)63).ContainsDefinedFlagsOnly());
+
+		// Test with FlagsTypeWithMissingBits enum (0, 1, 2, 8, 16)
+		Assert.True(FlagsTypeWithMissingBits.None.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsTypeWithMissingBits.A.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsTypeWithMissingBits.B.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsTypeWithMissingBits.D.ContainsDefinedFlagsOnly());
+		Assert.True(FlagsTypeWithMissingBits.E.ContainsDefinedFlagsOnly());
+
+		// Test with valid combinations for FlagsTypeWithMissingBits
+		Assert.True((FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).ContainsDefinedFlagsOnly());
+		Assert.True((FlagsTypeWithMissingBits.B | FlagsTypeWithMissingBits.D).ContainsDefinedFlagsOnly());
+
+		// Test with undefined flags for FlagsTypeWithMissingBits
+		Assert.False(((FlagsTypeWithMissingBits)4).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)5).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)6).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)7).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)31).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)32).ContainsDefinedFlagsOnly());
+		Assert.False(((FlagsTypeWithMissingBits)33).ContainsDefinedFlagsOnly());
+
+		// Test with NamedFlagsType enum
+		Assert.True(NamedFlagsType.None.ContainsDefinedFlagsOnly());
+		Assert.True(NamedFlagsType.A.ContainsDefinedFlagsOnly());
+		Assert.True(NamedFlagsType.B.ContainsDefinedFlagsOnly());
+		Assert.True(NamedFlagsType.C.ContainsDefinedFlagsOnly());
+		Assert.True(NamedFlagsType.D.ContainsDefinedFlagsOnly());
+		Assert.True(NamedFlagsType.E.ContainsDefinedFlagsOnly());
+
+		// Test with valid combinations for NamedFlagsType
+		Assert.True((NamedFlagsType.A | NamedFlagsType.B).ContainsDefinedFlagsOnly());
+		Assert.True((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).ContainsDefinedFlagsOnly());
+		Assert.True((NamedFlagsType.B | NamedFlagsType.D).ContainsDefinedFlagsOnly());
+		Assert.True((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).ContainsDefinedFlagsOnly());
+
+		// Test with undefined flags for NamedFlagsType (assuming it uses the same values as FlagsType)
+		Assert.False(((NamedFlagsType)32).ContainsDefinedFlagsOnly());
+		Assert.False(((NamedFlagsType)33).ContainsDefinedFlagsOnly());
+	}
+
+	[Fact]
 	public void FromIndexFlagReturnsCorrectResult()
 	{
 		Assert.Equal(FlagsType.None, FlagsTypeGen.FromIndex(0));

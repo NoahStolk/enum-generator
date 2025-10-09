@@ -120,4 +120,10 @@ internal static class TestEnumGen
 	{
 		return (value & flag) != 0;
 	}
+
+	public static bool ContainsDefinedFlagsOnly(this Tests.TestEnum value)
+	{
+		int raw = (int)value;
+		return (raw & ~(int)_definedBits) == 0;
+	}
 }

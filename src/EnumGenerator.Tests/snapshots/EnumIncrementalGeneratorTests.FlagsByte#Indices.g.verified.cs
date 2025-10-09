@@ -132,4 +132,10 @@ public static class IndicesGen
 	{
 		return (value & flag) != 0;
 	}
+
+	public static bool ContainsDefinedFlagsOnly(this Tests.Indices value)
+	{
+		byte raw = (byte)value;
+		return (raw & ~(byte)_definedBits) == 0;
+	}
 }

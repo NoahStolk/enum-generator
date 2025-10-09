@@ -132,6 +132,13 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 			writer.StartBlock();
 			writer.WriteLine("return (value & flag) != 0;");
 			writer.EndBlock();
+
+			writer.WriteLine();
+			writer.WriteLine($"public static bool ContainsDefinedFlagsOnly(this {enumModel.EnumTypeName} value)");
+			writer.StartBlock();
+			writer.WriteLine($"{enumModel.EnumUnderlyingTypeName} raw = ({enumModel.EnumUnderlyingTypeName})value;");
+			writer.WriteLine($"return (raw & ~({enumModel.EnumUnderlyingTypeName})_definedBits) == 0;");
+			writer.EndBlock();
 		}
 
 		writer.EndBlock();
