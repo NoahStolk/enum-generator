@@ -10,21 +10,19 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 {
 	public EnumModel Build()
 	{
-		return new EnumModel
-		{
-			EnumName = enumDeclarationSyntax.Identifier.Text,
-			EnumTypeName = enumSymbol.ToDisplayString(),
-			NamespaceName = enumSymbol.ContainingNamespace.ToDisplayString(),
-			Accessibility = enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
-			Members = GetMemberNames(),
-			HasFlagsAttribute = enumDeclarationSyntax.HasAttribute(semanticModel, "System.FlagsAttribute"),
-			GeneratedClassName = enumDeclarationSyntax.GetAttributeArgumentValue<string>(semanticModel, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}", "GeneratedClassName"),
-			EnumUnderlyingTypeName = GetEnumUnderlyingTypeString(enumSymbol.EnumUnderlyingType),
-			BinaryReaderMethodName = GetBinaryReaderMethodName(enumSymbol.EnumUnderlyingType),
-		};
+		return new EnumModel(
+			enumName: enumDeclarationSyntax.Identifier.Text,
+			enumTypeName: enumSymbol.ToDisplayString(),
+			namespaceName: enumSymbol.ContainingNamespace.ToDisplayString(),
+			accessibility: enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
+			members: GetMembers(),
+			hasFlagsAttribute: enumDeclarationSyntax.HasAttribute(semanticModel, "System.FlagsAttribute"),
+			generatedClassName: enumDeclarationSyntax.GetAttributeArgumentValue<string>(semanticModel, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}", "GeneratedClassName"),
+			enumUnderlyingTypeName: GetEnumUnderlyingTypeString(enumSymbol.EnumUnderlyingType),
+			binaryReaderMethodName: GetBinaryReaderMethodName(enumSymbol.EnumUnderlyingType));
 	}
 
-	private List<EnumMemberModel> GetMemberNames()
+	private List<EnumMemberModel> GetMembers()
 	{
 		List<EnumMemberModel> memberNames = [];
 		foreach (EnumMemberDeclarationSyntax member in enumDeclarationSyntax.Members)
@@ -44,13 +42,12 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 
 	public static EnumModel BuildFromCompilation(string? generatedClassName, INamedTypeSymbol namedTypeSymbol)
 	{
-		return new EnumModel
-		{
-			EnumName = namedTypeSymbol.Name,
-			EnumTypeName = namedTypeSymbol.ToDisplayString(),
-			NamespaceName = namedTypeSymbol.ContainingNamespace.ToDisplayString(),
-			Accessibility = "public",
-			Members = namedTypeSymbol
+		return new EnumModel(
+			enumName: namedTypeSymbol.Name,
+			enumTypeName: namedTypeSymbol.ToDisplayString(),
+			namespaceName: namedTypeSymbol.ContainingNamespace.ToDisplayString(),
+			accessibility: "public",
+			members: namedTypeSymbol
 				.GetMembers()
 				.OfType<IFieldSymbol>()
 
@@ -70,11 +67,10 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 					};
 				})
 				.ToList(),
-			HasFlagsAttribute = namedTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
-			GeneratedClassName = generatedClassName,
-			EnumUnderlyingTypeName = GetEnumUnderlyingTypeString(namedTypeSymbol.EnumUnderlyingType),
-			BinaryReaderMethodName = GetBinaryReaderMethodName(namedTypeSymbol.EnumUnderlyingType),
-		};
+			hasFlagsAttribute: namedTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "FlagsAttribute"),
+			generatedClassName: generatedClassName,
+			enumUnderlyingTypeName: GetEnumUnderlyingTypeString(namedTypeSymbol.EnumUnderlyingType),
+			binaryReaderMethodName: GetBinaryReaderMethodName(namedTypeSymbol.EnumUnderlyingType));
 	}
 
 	private static string GetEnumUnderlyingTypeString(INamedTypeSymbol? enumUnderlyingType)

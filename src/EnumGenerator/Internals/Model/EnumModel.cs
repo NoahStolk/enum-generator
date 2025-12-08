@@ -1,22 +1,63 @@
-﻿namespace EnumGenerator.Internals.Model;
+﻿using EnumGenerator.Internals.Extensions;
+using System.Numerics;
+
+namespace EnumGenerator.Internals.Model;
 
 internal sealed record EnumModel
 {
-	public required string EnumName { get; init; }
+	public EnumModel(
+		string enumName,
+		string enumTypeName,
+		string namespaceName,
+		string accessibility,
+		List<EnumMemberModel> members,
+		bool hasFlagsAttribute,
+		string? generatedClassName,
+		string enumUnderlyingTypeName,
+		string binaryReaderMethodName)
+	{
+		EnumName = enumName;
+		EnumTypeName = enumTypeName;
+		NamespaceName = namespaceName;
+		Accessibility = accessibility;
+		HasFlagsAttribute = hasFlagsAttribute;
+		GeneratedClassName = generatedClassName;
+		EnumUnderlyingTypeName = enumUnderlyingTypeName;
+		BinaryReaderMethodName = binaryReaderMethodName;
 
-	public required string EnumTypeName { get; init; }
+		if (hasFlagsAttribute)
+		{
+			UniqueMembers = members
+				.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue))
+				.DistinctBy(m => m.ConstantValue)
+				.ToList();
+		}
+		else
+		{
+			UniqueMembers = members.DistinctBy(m => m.ConstantValue).ToList();
+		}
 
-	public required string NamespaceName { get; init; }
+		static bool IsPowerOfTwo(BigInteger value)
+		{
+			return value != 0 && (value & (value - 1)) == 0;
+		}
+	}
 
-	public required string Accessibility { get; init; }
+	public string EnumName { get; }
 
-	public required List<EnumMemberModel> Members { get; init; }
+	public string EnumTypeName { get; }
 
-	public required bool HasFlagsAttribute { get; init; }
+	public string NamespaceName { get; }
 
-	public required string? GeneratedClassName { get; init; }
+	public string Accessibility { get; }
 
-	public required string EnumUnderlyingTypeName { get; init; }
+	public bool HasFlagsAttribute { get; }
 
-	public required string BinaryReaderMethodName { get; init; }
+	public string? GeneratedClassName { get; }
+
+	public string EnumUnderlyingTypeName { get; }
+
+	public string BinaryReaderMethodName { get; }
+
+	public List<EnumMemberModel> UniqueMembers { get; }
 }

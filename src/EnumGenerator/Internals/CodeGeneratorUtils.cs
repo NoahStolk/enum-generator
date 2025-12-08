@@ -28,25 +28,24 @@ internal static class CodeGeneratorUtils
 		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumTypeName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumTypeName}}>();""");
 	}
 
-	public static void GenerateNullTerminatedMemberNamesProperty(this CodeWriter writer, List<EnumMemberModel> uniqueMembers)
+	public static void GenerateNullTerminatedMemberNamesProperty(this CodeWriter writer, EnumModel enumModel)
 	{
-		if (uniqueMembers.Count == 0)
+		if (enumModel.UniqueMembers.Count == 0)
 			return;
 
-		string nullTerminatedMemberNames = string.Concat(uniqueMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
+		string nullTerminatedMemberNames = string.Concat(enumModel.UniqueMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
 		writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
-		writer.WriteLine();
 	}
 
-	public static void GenerateGetIndexMethod(this CodeWriter writer, EnumModel enumModel, List<EnumMemberModel> uniqueMembers)
+	public static void GenerateGetIndexMethod(this CodeWriter writer, EnumModel enumModel)
 	{
 		writer.WriteLine($"public static int GetIndex(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		for (int i = 0; i < uniqueMembers.Count; i++)
+		for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
 		{
-			EnumMemberModel member = uniqueMembers[i];
+			EnumMemberModel member = enumModel.UniqueMembers[i];
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => {i},");
 		}
 
@@ -55,15 +54,15 @@ internal static class CodeGeneratorUtils
 		writer.EndBlock();
 	}
 
-	public static void GenerateFromIndexMethod(this CodeWriter writer, EnumModel enumModel, List<EnumMemberModel> uniqueMembers)
+	public static void GenerateFromIndexMethod(this CodeWriter writer, EnumModel enumModel)
 	{
 		writer.WriteLine($"public static {enumModel.EnumTypeName} FromIndex(int index)");
 		writer.StartBlock();
 		writer.WriteLine("return index switch");
 		writer.StartBlock();
-		for (int i = 0; i < uniqueMembers.Count; i++)
+		for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
 		{
-			EnumMemberModel member = uniqueMembers[i];
+			EnumMemberModel member = enumModel.UniqueMembers[i];
 			writer.WriteLine($"{i} => {enumModel.EnumTypeName}.{member.Name},");
 		}
 

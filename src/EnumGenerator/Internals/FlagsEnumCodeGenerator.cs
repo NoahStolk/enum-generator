@@ -1,26 +1,14 @@
-﻿using EnumGenerator.Internals.Extensions;
-using EnumGenerator.Internals.Model;
+﻿using EnumGenerator.Internals.Model;
 using EnumGenerator.Internals.Utils;
-using System.Numerics;
 
 namespace EnumGenerator.Internals;
 
 internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 {
-	private static bool IsPowerOfTwo(BigInteger value)
-	{
-		return value != 0 && (value & (value - 1)) == 0;
-	}
-
 	public string Generate()
 	{
 		if (!enumModel.HasFlagsAttribute)
 			throw new NotSupportedException("Only flags enums are supported. Use the EnumCodeGenerator instead.");
-
-		List<EnumMemberModel> uniqueMembers = enumModel.Members
-			.Where(member => member.ConstantValue == 0 || IsPowerOfTwo(member.ConstantValue))
-			.DistinctBy(m => m.ConstantValue)
-			.ToList();
 
 		CodeWriter writer = new();
 		writer.AddUsingIfNeeded(enumModel, "System");
@@ -35,10 +23,10 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine($"private static readonly {enumModel.EnumTypeName} _definedBits =");
 		writer.StartIndent();
-		for (int i = 0; i < uniqueMembers.Count; i++)
+		for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
 		{
-			EnumMemberModel member = uniqueMembers[i];
-			if (i == uniqueMembers.Count - 1)
+			EnumMemberModel member = enumModel.UniqueMembers[i];
+			if (i == enumModel.UniqueMembers.Count - 1)
 				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name};");
 			else
 				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} |");
@@ -48,7 +36,7 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		writer.EndIndent();
 		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, string> _stringCache = new()");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in uniqueMembers)
+		foreach (EnumMemberModel member in enumModel.UniqueMembers)
 			writer.WriteLine($"{{ {enumModel.EnumTypeName}.{member.Name}, \"{member.DisplayName}\" }},");
 		writer.EndBlockWithSemicolon();
 		writer.WriteLine();
@@ -59,7 +47,8 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		writer.GenerateValuesProperty(enumModel);
 		writer.WriteLine();
 
-		writer.GenerateNullTerminatedMemberNamesProperty(uniqueMembers);
+		writer.GenerateNullTerminatedMemberNamesProperty(enumModel);
+		writer.WriteLine();
 
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
@@ -114,10 +103,10 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		writer.EndBlock();
 		writer.WriteLine();
 
-		writer.GenerateGetIndexMethod(enumModel, uniqueMembers);
+		writer.GenerateGetIndexMethod(enumModel);
 		writer.WriteLine();
 
-		writer.GenerateFromIndexMethod(enumModel, uniqueMembers);
+		writer.GenerateFromIndexMethod(enumModel);
 		writer.WriteLine();
 
 		writer.GenerateWriteMethod(enumModel);

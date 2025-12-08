@@ -1,5 +1,4 @@
-﻿using EnumGenerator.Internals.Extensions;
-using EnumGenerator.Internals.Model;
+﻿using EnumGenerator.Internals.Model;
 using EnumGenerator.Internals.Utils;
 
 namespace EnumGenerator.Internals;
@@ -10,8 +9,6 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 	{
 		if (enumModel.HasFlagsAttribute)
 			throw new NotSupportedException("Flags enums are not supported. Use the FlagEnumCodeGenerator instead.");
-
-		List<EnumMemberModel> uniqueMembers = enumModel.Members.DistinctBy(m => m.ConstantValue).ToList();
 
 		CodeWriter writer = new();
 		writer.AddUsingIfNeeded(enumModel, "System");
@@ -26,13 +23,14 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.GenerateValuesProperty(enumModel);
 		writer.WriteLine();
 
-		writer.GenerateNullTerminatedMemberNamesProperty(uniqueMembers);
+		writer.GenerateNullTerminatedMemberNamesProperty(enumModel);
+		writer.WriteLine();
 
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in uniqueMembers)
+		foreach (EnumMemberModel member in enumModel.UniqueMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\",");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
@@ -43,7 +41,7 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in uniqueMembers)
+		foreach (EnumMemberModel member in enumModel.UniqueMembers)
 			writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => \"{member.DisplayName}\"u8,");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
@@ -54,17 +52,17 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.StartBlock();
 		writer.WriteLine("return value switch");
 		writer.StartBlock();
-		foreach (EnumMemberModel member in uniqueMembers)
+		foreach (EnumMemberModel member in enumModel.UniqueMembers)
 			writer.WriteLine($"\"{member.DisplayName}\" => {enumModel.EnumTypeName}.{member.Name},");
 		writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
 		writer.EndBlockWithSemicolon();
 		writer.EndBlock();
 		writer.WriteLine();
 
-		writer.GenerateGetIndexMethod(enumModel, uniqueMembers);
+		writer.GenerateGetIndexMethod(enumModel);
 		writer.WriteLine();
 
-		writer.GenerateFromIndexMethod(enumModel, uniqueMembers);
+		writer.GenerateFromIndexMethod(enumModel);
 		writer.WriteLine();
 
 		writer.GenerateWriteMethod(enumModel);
