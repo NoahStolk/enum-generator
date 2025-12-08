@@ -13,6 +13,16 @@ namespace Tests;
 
 public static class TestEnumGen
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)Tests.TestEnum.None,
+		(int)Tests.TestEnum.First,
+		(int)Tests.TestEnum.Second,
+		(int)Tests.TestEnum.Third,
+		(int)Tests.TestEnum.Fourth,
+		(int)Tests.TestEnum.Fifth,
+	};
+
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "None\0First\0Second\0Third\0Fourth\0Fifth\0"u8;
@@ -95,5 +105,10 @@ public static class TestEnumGen
 	public static Tests.TestEnum ReadTestEnum(this BinaryReader reader)
 	{
 		return (Tests.TestEnum)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this Tests.TestEnum value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

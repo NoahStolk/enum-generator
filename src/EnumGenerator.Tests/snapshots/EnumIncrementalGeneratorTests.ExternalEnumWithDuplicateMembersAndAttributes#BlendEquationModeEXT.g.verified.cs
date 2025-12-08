@@ -13,6 +13,17 @@ namespace Silk.NET.OpenGL;
 
 public static class BlendEquationModeEXTGen
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.FuncAdd,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.Min,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.Max,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.FuncSubtract,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.FuncReverseSubtract,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMinSgix,
+		(int)Silk.NET.OpenGL.BlendEquationModeEXT.AlphaMaxSgix,
+	};
+
 	public static IReadOnlyList<Silk.NET.OpenGL.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Silk.NET.OpenGL.BlendEquationModeEXT>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
@@ -100,5 +111,10 @@ public static class BlendEquationModeEXTGen
 	public static Silk.NET.OpenGL.BlendEquationModeEXT ReadBlendEquationModeEXT(this BinaryReader reader)
 	{
 		return (Silk.NET.OpenGL.BlendEquationModeEXT)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this Silk.NET.OpenGL.BlendEquationModeEXT value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

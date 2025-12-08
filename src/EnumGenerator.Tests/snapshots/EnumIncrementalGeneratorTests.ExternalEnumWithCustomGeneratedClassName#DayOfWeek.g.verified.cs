@@ -12,6 +12,17 @@ namespace System;
 
 public static class DayOfWeekGeneratedUtilities
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)System.DayOfWeek.Sunday,
+		(int)System.DayOfWeek.Monday,
+		(int)System.DayOfWeek.Tuesday,
+		(int)System.DayOfWeek.Wednesday,
+		(int)System.DayOfWeek.Thursday,
+		(int)System.DayOfWeek.Friday,
+		(int)System.DayOfWeek.Saturday,
+	};
+
 	public static IReadOnlyList<System.DayOfWeek> Values { get; } = Enum.GetValues<System.DayOfWeek>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Sunday\0Monday\0Tuesday\0Wednesday\0Thursday\0Friday\0Saturday\0"u8;
@@ -99,5 +110,10 @@ public static class DayOfWeekGeneratedUtilities
 	public static System.DayOfWeek ReadDayOfWeek(this BinaryReader reader)
 	{
 		return (System.DayOfWeek)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this System.DayOfWeek value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

@@ -23,6 +23,18 @@ internal static class CodeGeneratorUtils
 		return enumModel.GeneratedClassName!;
 	}
 
+	public static void GenerateDefinedValuesHashSet(this CodeWriter writer, EnumModel enumModel)
+	{
+		if (enumModel.UniqueMembers.Count == 0)
+			return;
+
+		writer.WriteLine($"private static readonly HashSet<{enumModel.EnumUnderlyingTypeName}> _definedValues = new()");
+		writer.StartBlock();
+		foreach (EnumMemberModel member in enumModel.UniqueMembers)
+			writer.WriteLine($"({enumModel.EnumUnderlyingTypeName}){enumModel.EnumTypeName}.{member.Name},");
+		writer.EndBlockWithSemicolon();
+	}
+
 	public static void GenerateValuesProperty(this CodeWriter writer, EnumModel enumModel)
 	{
 		writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumTypeName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumTypeName}}>();""");
@@ -84,6 +96,17 @@ internal static class CodeGeneratorUtils
 		writer.WriteLine($"public static {enumModel.EnumTypeName} Read{enumModel.EnumName}(this BinaryReader reader)");
 		writer.StartBlock();
 		writer.WriteLine($"return ({enumModel.EnumTypeName})reader.{enumModel.BinaryReaderMethodName}();");
+		writer.EndBlock();
+	}
+
+	public static void GenerateIsDefinedMethod(this CodeWriter writer, EnumModel enumModel)
+	{
+		writer.WriteLine($"public static bool IsDefined(this {enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		if (enumModel.UniqueMembers.Count == 0)
+			writer.WriteLine("return false;");
+		else
+			writer.WriteLine($"return _definedValues.Contains(({enumModel.EnumUnderlyingTypeName})value);");
 		writer.EndBlock();
 	}
 }

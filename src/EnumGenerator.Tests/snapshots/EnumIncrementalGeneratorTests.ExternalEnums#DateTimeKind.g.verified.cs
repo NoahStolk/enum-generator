@@ -12,6 +12,13 @@ namespace System;
 
 public static class DateTimeKindGen
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)System.DateTimeKind.Unspecified,
+		(int)System.DateTimeKind.Utc,
+		(int)System.DateTimeKind.Local,
+	};
+
 	public static IReadOnlyList<System.DateTimeKind> Values { get; } = Enum.GetValues<System.DateTimeKind>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "Unspecified\0Utc\0Local\0"u8;
@@ -79,5 +86,10 @@ public static class DateTimeKindGen
 	public static System.DateTimeKind ReadDateTimeKind(this BinaryReader reader)
 	{
 		return (System.DateTimeKind)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this System.DateTimeKind value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

@@ -307,4 +307,54 @@ public sealed class EnumTests
 
 		Assert.Equal(value, result);
 	}
+
+	[Fact]
+	public void IsDefinedReturnsCorrectResult()
+	{
+		Assert.True(IntegerType.Byte.IsDefined());
+		Assert.True(IntegerType.Short.IsDefined());
+		Assert.True(IntegerType.Int.IsDefined());
+		Assert.True(IntegerType.Long.IsDefined());
+		Assert.False(((IntegerType)4).IsDefined());
+
+		Assert.True(UnderlyingTypedByte.A.IsDefined());
+		Assert.True(UnderlyingTypedByte.B.IsDefined());
+		Assert.True(UnderlyingTypedByte.C.IsDefined());
+		Assert.False(((UnderlyingTypedByte)3).IsDefined());
+
+		Assert.True(UnderlyingTypedUShort.A.IsDefined());
+		Assert.True(UnderlyingTypedUShort.B.IsDefined());
+		Assert.True(UnderlyingTypedUShort.C.IsDefined());
+		Assert.False(((UnderlyingTypedUShort)3).IsDefined());
+
+		Assert.True(UnderlyingTypedUInt.A.IsDefined());
+		Assert.True(UnderlyingTypedUInt.B.IsDefined());
+		Assert.True(UnderlyingTypedUInt.C.IsDefined());
+		Assert.False(((UnderlyingTypedUInt)3).IsDefined());
+
+		Assert.True(UnderlyingTypedULong.A.IsDefined());
+		Assert.True(UnderlyingTypedULong.B.IsDefined());
+		Assert.True(UnderlyingTypedULong.C.IsDefined());
+		Assert.False(((UnderlyingTypedULong)3).IsDefined());
+
+		Assert.True(UnderlyingTypedSByte.A.IsDefined());
+		Assert.True(UnderlyingTypedSByte.B.IsDefined());
+		Assert.True(UnderlyingTypedSByte.C.IsDefined());
+		Assert.False(((UnderlyingTypedSByte)3).IsDefined());
+
+		Assert.True(UnderlyingTypedShort.A.IsDefined());
+		Assert.True(UnderlyingTypedShort.B.IsDefined());
+		Assert.True(UnderlyingTypedShort.C.IsDefined());
+		Assert.False(((UnderlyingTypedShort)3).IsDefined());
+
+		Assert.True(UnderlyingTypedInt.A.IsDefined());
+		Assert.True(UnderlyingTypedInt.B.IsDefined());
+		Assert.True(UnderlyingTypedInt.C.IsDefined());
+		Assert.False(((UnderlyingTypedInt)3).IsDefined());
+
+		Assert.True(UnderlyingTypedLong.A.IsDefined());
+		Assert.True(UnderlyingTypedLong.B.IsDefined());
+		Assert.True(UnderlyingTypedLong.C.IsDefined());
+		Assert.False(((UnderlyingTypedLong)3).IsDefined());
+	}
 }

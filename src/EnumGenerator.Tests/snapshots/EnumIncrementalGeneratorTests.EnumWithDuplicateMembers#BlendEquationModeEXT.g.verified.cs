@@ -13,6 +13,17 @@ namespace Tests;
 
 public static class BlendEquationModeEXTGen
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)Tests.BlendEquationModeEXT.FuncAdd,
+		(int)Tests.BlendEquationModeEXT.Min,
+		(int)Tests.BlendEquationModeEXT.Max,
+		(int)Tests.BlendEquationModeEXT.FuncSubtract,
+		(int)Tests.BlendEquationModeEXT.FuncReverseSubtract,
+		(int)Tests.BlendEquationModeEXT.AlphaMinSgix,
+		(int)Tests.BlendEquationModeEXT.AlphaMaxSgix,
+	};
+
 	public static IReadOnlyList<Tests.BlendEquationModeEXT> Values { get; } = Enum.GetValues<Tests.BlendEquationModeEXT>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "FuncAdd\0Min\0Max\0FuncSubtract\0FuncReverseSubtract\0AlphaMinSgix\0AlphaMaxSgix\0"u8;
@@ -100,5 +111,10 @@ public static class BlendEquationModeEXTGen
 	public static Tests.BlendEquationModeEXT ReadBlendEquationModeEXT(this BinaryReader reader)
 	{
 		return (Tests.BlendEquationModeEXT)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this Tests.BlendEquationModeEXT value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

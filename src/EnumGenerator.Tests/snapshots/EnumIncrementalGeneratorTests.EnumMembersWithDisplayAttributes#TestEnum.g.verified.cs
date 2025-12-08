@@ -13,6 +13,12 @@ namespace Tests;
 
 internal static class TestEnumGen
 {
+	private static readonly HashSet<int> _definedValues = new()
+	{
+		(int)Tests.TestEnum.CSharp,
+		(int)Tests.TestEnum.CPlusPlus,
+	};
+
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
 	public static ReadOnlySpan<byte> NullTerminatedMemberNames => "C#\0C++\0"u8;
@@ -75,5 +81,10 @@ internal static class TestEnumGen
 	public static Tests.TestEnum ReadTestEnum(this BinaryReader reader)
 	{
 		return (Tests.TestEnum)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this Tests.TestEnum value)
+	{
+		return _definedValues.Contains((int)value);
 	}
 }

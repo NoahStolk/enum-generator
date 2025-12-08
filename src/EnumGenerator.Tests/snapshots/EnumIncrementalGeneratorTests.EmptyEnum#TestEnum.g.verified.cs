@@ -13,7 +13,9 @@ namespace Tests;
 
 internal static class TestEnumGen
 {
+
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
+
 
 	public static string ToStringFast(this Tests.TestEnum value)
 	{
@@ -63,5 +65,10 @@ internal static class TestEnumGen
 	public static Tests.TestEnum ReadTestEnum(this BinaryReader reader)
 	{
 		return (Tests.TestEnum)reader.ReadInt32();
+	}
+
+	public static bool IsDefined(this Tests.TestEnum value)
+	{
+		return false;
 	}
 }

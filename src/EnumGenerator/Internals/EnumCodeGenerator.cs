@@ -20,6 +20,9 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine($"{enumModel.Accessibility} static class {enumModel.GetClassName()}");
 		writer.StartBlock();
 
+		writer.GenerateDefinedValuesHashSet(enumModel);
+		writer.WriteLine();
+
 		writer.GenerateValuesProperty(enumModel);
 		writer.WriteLine();
 
@@ -69,6 +72,9 @@ internal sealed class EnumCodeGenerator(EnumModel enumModel)
 		writer.WriteLine();
 
 		writer.GenerateReadMethod(enumModel);
+		writer.WriteLine();
+
+		writer.GenerateIsDefinedMethod(enumModel);
 
 		writer.EndBlock();
 
