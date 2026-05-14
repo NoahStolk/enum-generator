@@ -1,0 +1,105 @@
+using EnumGenerator.Internals.Model;
+using EnumGenerator.Internals.Utils;
+
+namespace EnumGenerator.Internals.Extensions;
+
+internal static class CodeWriterExtensions
+{
+	extension(CodeWriter writer)
+	{
+		public void AddUsingIfNeeded(EnumModel enumModel, string usingNamespace)
+		{
+			if (enumModel.NamespaceName == usingNamespace)
+				return;
+
+			writer.WriteLine($"using {usingNamespace};");
+		}
+
+		public void GenerateDefinedValuesHashSet(EnumModel enumModel)
+		{
+			if (enumModel.UniqueMembers.Count == 0)
+				return;
+
+			writer.WriteLine($"private static readonly HashSet<{enumModel.EnumUnderlyingTypeName}> _definedValues = new()");
+			writer.StartBlock();
+			foreach (EnumMemberModel member in enumModel.UniqueMembers)
+				writer.WriteLine($"({enumModel.EnumUnderlyingTypeName}){enumModel.EnumTypeName}.{member.Name},");
+			writer.EndBlockWithSemicolon();
+		}
+
+		public void GenerateValuesProperty(EnumModel enumModel)
+		{
+			writer.WriteLine($$"""public static IReadOnlyList<{{enumModel.EnumTypeName}}> Values { get; } = Enum.GetValues<{{enumModel.EnumTypeName}}>();""");
+		}
+
+		public void GenerateNullTerminatedMemberNamesProperty(EnumModel enumModel)
+		{
+			if (enumModel.UniqueMembers.Count == 0)
+				return;
+
+			string nullTerminatedMemberNames = string.Concat(enumModel.UniqueMembers.Select(kvp => $"{kvp.DisplayName}\\0"));
+			writer.WriteLine($"public static ReadOnlySpan<byte> NullTerminatedMemberNames => \"{nullTerminatedMemberNames}\"u8;");
+		}
+
+		public void GenerateGetIndexMethod(EnumModel enumModel)
+		{
+			writer.WriteLine($"public static int GetIndex(this {enumModel.EnumTypeName} value)");
+			writer.StartBlock();
+			writer.WriteLine("return value switch");
+			writer.StartBlock();
+			for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
+			{
+				EnumMemberModel member = enumModel.UniqueMembers[i];
+				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} => {i},");
+			}
+
+			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(value), value, null),");
+			writer.EndBlockWithSemicolon();
+			writer.EndBlock();
+		}
+
+		public void GenerateFromIndexMethod(EnumModel enumModel)
+		{
+			writer.WriteLine($"public static {enumModel.EnumTypeName} FromIndex(int index)");
+			writer.StartBlock();
+			writer.WriteLine("return index switch");
+			writer.StartBlock();
+			for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
+			{
+				EnumMemberModel member = enumModel.UniqueMembers[i];
+				writer.WriteLine($"{i} => {enumModel.EnumTypeName}.{member.Name},");
+			}
+
+			writer.WriteLine("_ => throw new ArgumentOutOfRangeException(nameof(index), index, null),");
+			writer.EndBlockWithSemicolon();
+			writer.EndBlock();
+		}
+
+		public void GenerateWriteMethod(EnumModel enumModel)
+		{
+			writer.WriteLine($"public static void Write(this BinaryWriter writer, {enumModel.EnumTypeName} value)");
+			writer.StartBlock();
+			writer.WriteLine($"writer.Write(({enumModel.EnumUnderlyingTypeName})value);");
+			writer.EndBlock();
+		}
+
+		public void GenerateReadMethod(EnumModel enumModel)
+		{
+			writer.WriteLine($"public static {enumModel.EnumTypeName} Read{enumModel.EnumName}(this BinaryReader reader)");
+			writer.StartBlock();
+			writer.WriteLine($"return ({enumModel.EnumTypeName})reader.{enumModel.BinaryReaderMethodName}();");
+			writer.EndBlock();
+		}
+
+		public void GenerateIsDefinedMethod(EnumModel enumModel)
+		{
+			writer.WriteLine($"public static bool IsDefined(this {enumModel.EnumTypeName} value)");
+			writer.StartBlock();
+			if (enumModel.UniqueMembers.Count == 0)
+				writer.WriteLine("return false;");
+			else
+				writer.WriteLine($"return _definedValues.Contains(({enumModel.EnumUnderlyingTypeName})value);");
+			writer.EndBlock();
+		}
+	}
+}

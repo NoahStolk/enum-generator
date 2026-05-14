@@ -1,4 +1,5 @@
-﻿using EnumGenerator.Internals.Model;
+﻿using EnumGenerator.Internals.Extensions;
+using EnumGenerator.Internals.Model;
 using EnumGenerator.Internals.Utils;
 
 namespace EnumGenerator.Internals;

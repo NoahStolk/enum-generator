@@ -60,4 +60,14 @@ internal sealed record EnumModel
 	public string BinaryReaderMethodName { get; }
 
 	public List<EnumMemberModel> UniqueMembers { get; }
+
+	public string GetClassName()
+	{
+		// TODO: Maybe also check if GeneratedClassName is a valid C# identifier.
+		if (string.IsNullOrWhiteSpace(GeneratedClassName))
+			return $"{EnumName}Gen";
+
+		// ! IsNullOrWhiteSpace is not annotated in .NET Standard 2.0.
+		return GeneratedClassName!;
+	}
 }
