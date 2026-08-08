@@ -8,7 +8,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-    <PackageReference Include="xunit"/>
+    <PackageReference Include="xunit.v3"/>
     <PackageReference Include="xunit.runner.visualstudio">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -16,7 +16,11 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="NoahStolk.EnumGenerator" Version="0.0.0-temp">
+    <!--
+    VersionOverride, not Version: central package management (Directory.Packages.props) applies to this
+    project too, and the version here is the temp one produced by `dotnet pack` for integration testing.
+    -->
+    <PackageReference Include="NoahStolk.EnumGenerator" VersionOverride="0.0.0-temp">
       <!-- Make sure to include "compile" assets as we need the DLL inside the "lib" folder. -->
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive; compile</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
