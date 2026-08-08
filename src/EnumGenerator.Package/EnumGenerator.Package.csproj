@@ -3,11 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <!-- This project exists only to produce the NuGet; its own (empty) assembly must not end up in lib/. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+
+    <!-- Analyzer-only package: no lib/ folder, so the (empty) netstandard2.0 dependency group would only trigger NU5128. -->
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 
   <PropertyGroup Label="Package configuration">
     <PackageId>NoahStolk.EnumGenerator</PackageId>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <Authors>Noah Stolk</Authors>
     <Copyright>Copyright © Noah Stolk</Copyright>
     <RepositoryType>git</RepositoryType>
@@ -21,15 +27,17 @@
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
+  <!--
+  The package ships nothing but the generator itself. The attributes are emitted into the consuming compilation by the
+  generator, so there is no lib/ folder and therefore no need for consumers to include the "compile" asset - the
+  IncludeAssets list NuGet writes for a development dependency (which omits "compile") is correct as-is.
+  -->
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="" Visible="false"/>
     <None Include="$(OutputPath)\EnumGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
-    <None Include="$(OutputPath)\EnumGenerator.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
-    <None Include="$(OutputPath)\EnumGenerator.Attributes.dll" Pack="true" PackagePath="lib/netstandard2.0" Visible="false"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EnumGenerator.Attributes\EnumGenerator.Attributes.csproj" PrivateAssets="all"/>
     <ProjectReference Include="..\EnumGenerator\EnumGenerator.csproj" PrivateAssets="all"/>
   </ItemGroup>
 

@@ -18,7 +18,7 @@ Enum-generator is a zero-dependency library containing a source generator that g
 - **Custom display names** — `[Display(Name = "...")]` on a member overrides the name used by all string conversions.
 - **Enums you don't own** — assembly-level `[GenerateEnumUtilities<T>]` generates utilities for enums from the BCL or third-party libraries.
 - **All underlying types** — `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, and `ulong` are supported.
-- **Zero dependencies** — the package only contains the source generator and its attributes; nothing is added to your runtime dependencies.
+- **Zero dependencies** — the package contains nothing but the source generator. The attributes are generated into your own project, so there is no assembly to reference and nothing is added to your runtime dependencies.
 
 ## Examples
 
@@ -28,7 +28,18 @@ Enum-generator is a zero-dependency library containing a source generator that g
 dotnet add package NoahStolk.EnumGenerator
 ```
 
+This is an analyzer-only package, so the `PackageReference` it writes needs no further editing:
+
+```xml
+<PackageReference Include="NoahStolk.EnumGenerator">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+</PackageReference>
+```
+
 The generated code uses UTF-8 string literals and `Enum.GetValues<T>()`, so consuming projects need C# 11 or newer and .NET 5 or newer. The analyzer itself requires .NET SDK 9.0.3xx (or VS 2022 17.14) or newer.
+
+The `[GenerateEnumUtilities]` attributes are generated into your compilation as `internal` types in the `EnumGenerator` namespace — there is no assembly to reference, and the package leaves no trace in your build output or in the dependencies of any package you publish.
 
 ### Getting started
 

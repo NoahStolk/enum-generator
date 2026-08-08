@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EnumGenerator.Attributes\EnumGenerator.Attributes.csproj"/>
     <ProjectReference Include="..\EnumGenerator\EnumGenerator.csproj"/>
   </ItemGroup>
 
