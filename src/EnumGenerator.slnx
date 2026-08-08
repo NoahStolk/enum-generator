@@ -1,5 +1,4 @@
 ﻿<Solution>
-  <Project Path="EnumGenerator.Attributes\EnumGenerator.Attributes.csproj" Type="Classic C#" />
   <Project Path="EnumGenerator.Package\EnumGenerator.Package.csproj" Type="Classic C#" />
   <Project Path="EnumGenerator.Sample\EnumGenerator.Sample.csproj" Type="Classic C#" />
   <Project Path="EnumGenerator.Tests.Integration\EnumGenerator.Tests.Integration.csproj" Type="Classic C#" />

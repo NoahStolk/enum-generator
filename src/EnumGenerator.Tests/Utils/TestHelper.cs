@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using EnumGenerator.Internals.Utils;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -13,7 +14,23 @@ internal static class TestHelper
 		generalDiagnosticOption: ReportDiagnostic.Warn,
 		nullableContextOptions: NullableContextOptions.Enable);
 
+	/// <summary>
+	/// Verifies the utilities generated for <paramref name="source"/>. The attributes the generator adds during
+	/// post-initialization are excluded, since they are identical for every compilation;
+	/// <see cref="VerifyIncludingAttributes"/> covers those.
+	/// </summary>
 	public static Task Verify(string source, params string[] args)
+	{
+		return Verify(source, includeAttributes: false, args);
+	}
+
+	/// <summary>Verifies the attributes the generator emits into the consuming compilation.</summary>
+	public static Task VerifyIncludingAttributes(string source)
+	{
+		return Verify(source, includeAttributes: true, []);
+	}
+
+	private static Task Verify(string source, bool includeAttributes, string[] args)
 	{
 		Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 		Assembly netstandard = assemblies.Single(a => a.GetName().Name == "netstandard");
@@ -26,7 +43,6 @@ internal static class TestHelper
 			references:
 			[
 				MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-				MetadataReference.CreateFromFile(typeof(GenerateEnumUtilitiesAttribute).Assembly.Location),
 				MetadataReference.CreateFromFile(netstandard.Location),
 				MetadataReference.CreateFromFile(systemRuntime.Location),
 				MetadataReference.CreateFromFile(typeof(DisplayAttribute).Assembly.Location),
@@ -42,6 +58,9 @@ internal static class TestHelper
 			return Task.FromException(new InvalidOperationException($"Post-generator compilation failed ({diagnostics.Length} errors):\n{string.Join(Environment.NewLine, diagnostics)}"));
 
 		SettingsTask settingsTask = Verifier.Verify(driver).UseDirectory(Path.Combine("..", "snapshots"));
+		if (!includeAttributes)
+			settingsTask = settingsTask.IgnoreGeneratedResult(r => r.HintName == AttributeSourceUtils.HintName);
+
 		if (args.Length > 0)
 			settingsTask = settingsTask.UseParameters(args);
 

@@ -16,6 +16,12 @@ public sealed class EnumIncrementalGenerator : IIncrementalGenerator
 {
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
+		// The attributes must be added during post-initialization; both providers below resolve them through the
+		// semantic model, which only sees post-initialization sources when it runs.
+		context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
+			AttributeSourceUtils.HintName,
+			SourceText.From(SourceBuilderUtils.Build(AttributeSourceUtils.SourceCode), Encoding.UTF8)));
+
 		// ! LINQ is used to filter out null values.
 		IncrementalValuesProvider<EnumModel> enumModelProvider = context.SyntaxProvider
 			.CreateSyntaxProvider(

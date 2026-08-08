@@ -34,12 +34,14 @@ The project links the integration-test `.cs` files from `EnumGenerator.Tests.Int
 
 ## Architecture
 
-This is a Roslyn `IIncrementalGenerator` that emits enum helper extension methods. It ships as the `NoahStolk.EnumGenerator` NuGet package, packed by `EnumGenerator.Package` — that project is the only `IsPackable=true` one and bundles the generator DLL + attributes DLL into `analyzers/dotnet/cs` plus the attributes DLL into `lib/netstandard2.0`.
+This is a Roslyn `IIncrementalGenerator` that emits enum helper extension methods. It ships as the `NoahStolk.EnumGenerator` NuGet package, packed by `EnumGenerator.Package` — that project is the only `IsPackable=true` one, and the package contains nothing but the generator DLL in `analyzers/dotnet/cs` (plus the README).
+
+**The package is analyzer-only on purpose — do not add a `lib/` folder to it.** It sets `DevelopmentDependency=true`, which makes NuGet write `<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>` on install — note the absent `compile`. Anything placed in `lib/` would therefore be invisible to consumers, who would have to hand-edit `IncludeAssets` after every install. This is why the attributes are emitted into the consuming compilation (see below) rather than shipped as a reference assembly. `EnumGenerator.Package` also sets `IncludeBuildOutput=false` (so its own empty assembly stays out of the package) and `SuppressDependenciesWhenPacking=true` (so the empty dependency group does not trip NU5128).
 
 ### Project layout
 
 - `EnumGenerator` (netstandard2.0, `IsRoslynComponent=true`) — the incremental generator. Must stay netstandard2.0 for Roslyn host compatibility.
-- `EnumGenerator.Attributes` (netstandard2.0) — public attributes shipped in the `EnumGenerator` namespace. Consumers reference these from their code.
+- The attributes are **not** a separate project. `AttributeSourceUtils` holds their source as a string, and `EnumIncrementalGenerator` emits it via `RegisterPostInitializationOutput`. Post-initialization is mandatory here: both providers resolve `[GenerateEnumUtilities]` through the semantic model, and only post-initialization sources are visible to it during the generator run — moving them to `RegisterSourceOutput` would silently break all detection.
 - `EnumGenerator.Package` — packaging-only project; produces the NuGet.
 - `EnumGenerator.Sample` (net10.0) — debug target for the generator. Use the project's `launchSettings.json` to attach the debugger.
 - `EnumGenerator.Tests` (net10.0) — Verify snapshot tests of generator output.
@@ -66,6 +68,7 @@ The default generated class name is `{EnumName}Gen`; consumers can override with
   - Planned bump to **5.0.0** (floor: SDK 10.0.100 / VS 18.0) once .NET 9 hits end of support on **2026-11-10**.
   - To see what a given SDK's compiler is: `dotnet /usr/share/dotnet/sdk/<version>/Roslyn/bincore/csc.dll -version`. SDK 10.0.100 ships Roslyn 5.0; 11.0.100-preview ships 5.7.
   - `EnumGenerator.Tests.NuGetIntegration` is the only test surface that catches this, since it consumes the packed analyzer the way a real consumer does — an in-solution build will not.
+- `EnumGenerator.Tests.NuGetIntegration` deliberately declares the **exact** `PrivateAssets`/`IncludeAssets` that `dotnet add package` writes for a development dependency, i.e. **without** `compile`. Do not add assets to make a build pass — if that project stops compiling, the *package layout* is wrong, not the test.
 - The generator targets **netstandard2.0**, so APIs like `string.IsNullOrWhiteSpace` are not nullable-annotated — note the `!` suppression in `CodeGeneratorUtils.GetClassName`.
 - `EnforceExtendedAnalyzerRules=true` is set on the generator project; avoid APIs that Roslyn flags as unsafe for analyzers/generators.
 - Heavy static analysis is on globally (`AnalysisMode=All`, `WarningsAsErrors=nullable`, plus Roslynator, SonarAnalyzer, StyleCop, BannedApiAnalyzers, Nullable.Extended). Expect builds to fail on warnings you'd ignore elsewhere.
