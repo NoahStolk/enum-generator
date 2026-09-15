@@ -7,8 +7,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 The solution file is `src/EnumGenerator.slnx` (the newer slnx format) and the SDK is pinned via `global.json` (10.0.100, `rollForward: latestMinor`). All commands below are run from the repo root unless noted.
 
 - Build: `dotnet build src/EnumGenerator.slnx -c Release`
-- Run all tests: `dotnet test src/EnumGenerator.slnx -c Release --no-build`
-- Run a single test class/method (uses xUnit v3 + Microsoft.Testing.Platform): `dotnet test src/EnumGenerator.Tests/EnumGenerator.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~EnumIncrementalGeneratorTests.EnumWithFlagsAttribute"`
+- Run all tests: `dotnet test --solution src/EnumGenerator.slnx -c Release --no-build`
+- Run a single test class/method: `dotnet test --project src/EnumGenerator.Tests/EnumGenerator.Tests.csproj -c Release --no-build -- --treenode-filter "/*/*/EnumIncrementalGeneratorTests/EnumWithFlagsAttribute"`
+
+  Tests run on TUnit, which uses Microsoft.Testing.Platform rather than VSTest. Two consequences bite if you
+  forget them: `dotnet test` needs `--solution`/`--project` instead of a bare path (a positional path is
+  rejected), and VSTest's `--filter "FullyQualifiedName~X"` is **silently ignored** — MTP prints its help and
+  exits reporting zero tests, which reads like a pass. Use
+  `--treenode-filter "/<Assembly>/<Namespace>/<Class>/<Test>"`. `test.runner` in `global.json` is what puts
+  `dotnet test` into MTP mode; without it nothing runs at all.
 - Run the sample (useful for eyeballing generated output): `dotnet run --project src/EnumGenerator.Sample`
 
 ### NuGet integration tests
@@ -20,17 +27,51 @@ cd src/
 dotnet pack -c Release -o ./artifacts -p:Version=0.0.0-temp
 dotnet restore EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj --packages ./packages --configfile "nuget.integration-tests.config"
 dotnet build EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj -c Release --packages ./packages --no-restore
-dotnet test  EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj -c Release --no-build --no-restore
+dotnet test  --project EnumGenerator.Tests.NuGetIntegration/EnumGenerator.Tests.NuGetIntegration.csproj -c Release --no-build --no-restore
 ```
 
 The project links the integration-test `.cs` files from `EnumGenerator.Tests.Integration` via wildcard `<Compile Include="..\EnumGenerator.Tests.Integration\**\*.cs" Link="..." />` — keep the two test surfaces parallel.
 
 ### Snapshot tests
 
-`EnumGenerator.Tests` uses Verify.SourceGenerators + Verify.XunitV3. Snapshots live in `src/EnumGenerator.Tests/snapshots/` (relocated via `UseDirectory(Path.Combine("..", "snapshots"))` in `TestHelper`).
+`EnumGenerator.Tests` uses Verify.SourceGenerators + Verify.TUnit. Snapshots live in `src/EnumGenerator.Tests/snapshots/` (relocated via `UseDirectory(Path.Combine("..", "snapshots"))` in `TestHelper`).
+
+Parameterized snapshot names (`EnumIncrementalGeneratorTests.Enum_accessibility=internal,byte#TestEnum.g.verified.cs`)
+come from `TestHelper.Verify(code, params string[] args)` calling `UseParameters(args)` — the values are passed
+explicitly at the call site, so an `[Arguments]` row must keep passing every value it varies, or two rows collapse
+onto the same snapshot file and silently overwrite each other.
 
 - Accept all pending snapshots: `./scripts/accept-all.sh src/EnumGenerator.Tests/snapshots` (renames every `*.received.cs` over `*.verified.cs`).
 - DiffEngine: control the diff tool with the `DiffEngine_ToolOrder` env var, or disable it with `DiffEngine_Disable=true`.
+
+### Test framework and the Verify maintenance fee
+
+Tests are TUnit (`[Test]`, `[Arguments(...)]` for parameterized rows, `await Assert.That(x).IsEqualTo(y)` — assertions
+are async, so test methods are `async Task`). `Microsoft.NET.Test.Sdk` and `coverlet.*` must **not** come back: they
+pull in the VSTest host and break TUnit's test discovery. Each test project is `OutputType=Exe` because MTP generates
+the entry point; `src/Directory.Build.targets` mutes CA1515 and CA2007 for test projects, which is fallout from that,
+not style drift.
+
+Two things in `EnumTests` are shaped the way they are on purpose:
+
+- `ReadOnlySpan<byte>` has no TUnit assertion — a `ref struct` cannot be a generic type argument — so the `u8`
+  comparisons go through `.ToArray()` and `IsEquivalentTo(..., CollectionOrdering.Matching)`. Keep the
+  `CollectionOrdering.Matching`: `IsEquivalentTo` ignores order by default. For the same reason the `Throws` cases on
+  `AsUtf8Span()` use a statement lambda (`() => { _ = ...; }`) so it binds to `Action` rather than `Func<ReadOnlySpan<byte>>`.
+- `RoundTrip` is `async Task` with a separate one-line `unsafe SizeOf<T>()` helper, because `await` is illegal in an
+  unsafe context (CS4004) and `sizeof(T)` on an unmanaged type parameter needs one.
+
+xUnit's `Assert.Throws<T>` matches the exact exception type, so these migrated to `ThrowsExactly<T>()`; TUnit's plain
+`Throws<T>()` would also accept subclasses.
+
+Verify v33 charges an [Open Source Maintenance Fee](https://github.com/VerifyTests/Verify/blob/main/docs/maintenance-fee.md)
+to revenue-generating organizations, enforced at build time. A build referencing any Verify package that declares
+nothing fails with **SC021**. This project claims the free `OpenSource` exemption in `src/Directory.Build.props`. The
+claim is time-bounded and the build starts failing once `Verify_SponsorshipExemptionUntil` has passed — bump it
+yearly; it is not dead config.
+
+Rider needs *Settings → Build, Execution, Deployment → Unit Testing → Testing Platform → "Enable Testing Platform
+support"* before it will discover any of these tests.
 
 ## Architecture
 

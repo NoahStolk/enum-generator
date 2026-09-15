@@ -9,7 +9,7 @@ namespace EnumGenerator.Tests;
 /// </summary>
 public sealed class GeneratedAttributesTests
 {
-	[Fact]
+	[Test]
 	public async Task GeneratedAttributes()
 	{
 		string code =

@@ -4,10 +4,10 @@ namespace EnumGenerator.Tests;
 
 public sealed class EnumIncrementalGeneratorTests
 {
-	[Theory]
-	[InlineData("internal", "int")]
-	[InlineData("internal", "byte")]
-	[InlineData("public", "int")]
+	[Test]
+	[Arguments("internal", "int")]
+	[Arguments("internal", "byte")]
+	[Arguments("public", "int")]
 	public async Task Enum(string accessibility, string underlyingType)
 	{
 		string code =
@@ -29,10 +29,10 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code, accessibility, underlyingType);
 	}
 
-	[Theory]
-	[InlineData("internal", "int")]
-	[InlineData("internal", "byte")]
-	[InlineData("public", "int")]
+	[Test]
+	[Arguments("internal", "int")]
+	[Arguments("internal", "byte")]
+	[Arguments("public", "int")]
 	public async Task EnumWithCustomGeneratedClassName(string accessibility, string underlyingType)
 	{
 		string code =
@@ -54,7 +54,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code, accessibility, underlyingType);
 	}
 
-	[Fact]
+	[Test]
 	public async Task EnumWithFlagsAttribute()
 	{
 		const string code =
@@ -78,7 +78,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task EnumMembersWithDisplayAttributes()
 	{
 		const string code =
@@ -99,7 +99,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ExternalEnum()
 	{
 		const string code =
@@ -112,7 +112,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ExternalEnumWithCustomGeneratedClassName()
 	{
 		const string code =
@@ -125,7 +125,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ExternalEnums()
 	{
 		const string code =
@@ -139,7 +139,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task EnumWithDuplicateMembers()
 	{
 		const string code =
@@ -167,7 +167,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ExternalEnumWithDuplicateMembers()
 	{
 		const string code =
@@ -196,7 +196,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task EnumWithDuplicateMembersAndAttributes()
 	{
 		const string code =
@@ -253,7 +253,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ExternalEnumWithDuplicateMembersAndAttributes()
 	{
 		const string code =
@@ -312,15 +312,15 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Theory]
-	[InlineData("byte")]
-	[InlineData("sbyte")]
-	[InlineData("short")]
-	[InlineData("ushort")]
-	[InlineData("int")]
-	[InlineData("uint")]
-	[InlineData("long")]
-	[InlineData("ulong")]
+	[Test]
+	[Arguments("byte")]
+	[Arguments("sbyte")]
+	[Arguments("short")]
+	[Arguments("ushort")]
+	[Arguments("int")]
+	[Arguments("uint")]
+	[Arguments("long")]
+	[Arguments("ulong")]
 	public async Task EnumWithDuplicateMembersFormattedDifferently(string underlyingType)
 	{
 		string code =
@@ -348,7 +348,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code, underlyingType);
 	}
 
-	[Fact]
+	[Test]
 	public async Task EmptyEnum()
 	{
 		const string code =
@@ -364,7 +364,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task NestedEnum()
 	{
 		const string code =
@@ -383,7 +383,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task ComplexFlagsEnum()
 	{
 		const string code =
@@ -424,7 +424,7 @@ public sealed class EnumIncrementalGeneratorTests
 		await TestHelper.Verify(code);
 	}
 
-	[Fact]
+	[Test]
 	public async Task FlagsByte()
 	{
 		const string code =
