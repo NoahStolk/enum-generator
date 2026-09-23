@@ -1,6 +1,7 @@
 ﻿using EnumGenerator.Internals.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -46,6 +47,7 @@ internal static class TestHelper
 				MetadataReference.CreateFromFile(netstandard.Location),
 				MetadataReference.CreateFromFile(systemRuntime.Location),
 				MetadataReference.CreateFromFile(typeof(DisplayAttribute).Assembly.Location),
+				MetadataReference.CreateFromFile(typeof(ConcurrentDictionary<,>).Assembly.Location),
 			],
 			options: _compilationOptions);
 

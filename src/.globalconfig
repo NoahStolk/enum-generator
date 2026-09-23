@@ -327,6 +327,9 @@ dotnet_diagnostic.S3453.severity                                              = 
 # Move class into a named namespace. (C# 10)
 dotnet_diagnostic.S3903.severity                                              = none
 
+# Allowing unsafe code is security-sensitive.
+dotnet_diagnostic.S6640.severity                                              = none
+
 # Enable XML documentation output.
 dotnet_diagnostic.SA0001.severity                                             = none
 

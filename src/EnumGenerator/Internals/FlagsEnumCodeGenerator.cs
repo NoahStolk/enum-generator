@@ -13,6 +13,7 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		CodeWriter writer = new();
 		writer.AddUsingIfNeeded(enumModel, "System");
+		writer.AddUsingIfNeeded(enumModel, "System.Collections.Concurrent");
 		writer.AddUsingIfNeeded(enumModel, "System.Collections.Generic");
 		writer.AddUsingIfNeeded(enumModel, "System.IO");
 		writer.AddUsingIfNeeded(enumModel, "System.Text");
@@ -35,14 +36,14 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine();
 		writer.EndIndent();
-		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, string> _stringCache = new()");
+		writer.WriteLine($"private static readonly ConcurrentDictionary<{enumModel.EnumTypeName}, string> _stringCache = new()");
 		writer.StartBlock();
 		foreach (EnumMemberModel member in enumModel.UniqueMembers)
-			writer.WriteLine($"{{ {enumModel.EnumTypeName}.{member.Name}, \"{member.DisplayName}\" }},");
+			writer.WriteLine($"[{enumModel.EnumTypeName}.{member.Name}] = \"{member.DisplayName}\",");
 		writer.EndBlockWithSemicolon();
 		writer.WriteLine();
 
-		writer.WriteLine($"private static readonly Dictionary<{enumModel.EnumTypeName}, byte[]> _utf8Cache = new();");
+		writer.WriteLine($"private static readonly ConcurrentDictionary<{enumModel.EnumTypeName}, byte[]> _utf8Cache = new();");
 		writer.WriteLine();
 
 		writer.GenerateValuesProperty(enumModel);
@@ -53,14 +54,7 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine($"public static string ToStringFast(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
-		writer.WriteLine("if (_stringCache.TryGetValue(value, out string? str))");
-		writer.StartIndent();
-		writer.WriteLine("return str;");
-		writer.EndIndent();
-		writer.WriteLine();
-		writer.WriteLine("str = GetFlagsString(value);");
-		writer.WriteLine("_stringCache[value] = str;");
-		writer.WriteLine("return str;");
+		writer.WriteLine("return _stringCache.GetOrAdd(value, GetFlagsString);");
 		writer.EndBlock();
 		writer.WriteLine();
 
@@ -93,14 +87,18 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 
 		writer.WriteLine($"public static ReadOnlySpan<byte> AsUtf8Span(this {enumModel.EnumTypeName} value)");
 		writer.StartBlock();
-		writer.WriteLine("if (_utf8Cache.TryGetValue(value, out byte[]? bytes))");
-		writer.StartIndent();
-		writer.WriteLine("return new ReadOnlySpan<byte>(bytes);");
-		writer.EndIndent();
+		writer.WriteLine("byte[] bytes = _utf8Cache.GetOrAdd(value, GetNullTerminatedUtf8Bytes);");
+		writer.WriteLine("return new ReadOnlySpan<byte>(bytes, 0, bytes.Length - 1);");
+		writer.EndBlock();
 		writer.WriteLine();
-		writer.WriteLine("bytes = Encoding.UTF8.GetBytes(value.ToStringFast());");
-		writer.WriteLine("_utf8Cache[value] = bytes;");
-		writer.WriteLine("return new ReadOnlySpan<byte>(bytes);");
+
+		writer.WriteLine($"private static byte[] GetNullTerminatedUtf8Bytes({enumModel.EnumTypeName} value)");
+		writer.StartBlock();
+		writer.WriteLine("// Allocate one extra byte so the buffer is null-terminated beyond the span, matching u8 literals.");
+		writer.WriteLine("string str = value.ToStringFast();");
+		writer.WriteLine("byte[] bytes = new byte[Encoding.UTF8.GetByteCount(str) + 1];");
+		writer.WriteLine("Encoding.UTF8.GetBytes(str, bytes);");
+		writer.WriteLine("return bytes;");
 		writer.EndBlock();
 		writer.WriteLine();
 

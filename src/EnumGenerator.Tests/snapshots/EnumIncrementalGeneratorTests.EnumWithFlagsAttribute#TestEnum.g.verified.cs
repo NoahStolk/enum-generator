@@ -6,6 +6,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -22,17 +23,17 @@ internal static class TestEnumGen
 		Tests.TestEnum.Fourth |
 		Tests.TestEnum.Fifth;
 
-	private static readonly Dictionary<Tests.TestEnum, string> _stringCache = new()
+	private static readonly ConcurrentDictionary<Tests.TestEnum, string> _stringCache = new()
 	{
-		{ Tests.TestEnum.None, "None" },
-		{ Tests.TestEnum.First, "First" },
-		{ Tests.TestEnum.Second, "Second" },
-		{ Tests.TestEnum.Third, "Third" },
-		{ Tests.TestEnum.Fourth, "Fourth" },
-		{ Tests.TestEnum.Fifth, "Fifth" },
+		[Tests.TestEnum.None] = "None",
+		[Tests.TestEnum.First] = "First",
+		[Tests.TestEnum.Second] = "Second",
+		[Tests.TestEnum.Third] = "Third",
+		[Tests.TestEnum.Fourth] = "Fourth",
+		[Tests.TestEnum.Fifth] = "Fifth",
 	};
 
-	private static readonly Dictionary<Tests.TestEnum, byte[]> _utf8Cache = new();
+	private static readonly ConcurrentDictionary<Tests.TestEnum, byte[]> _utf8Cache = new();
 
 	public static IReadOnlyList<Tests.TestEnum> Values { get; } = Enum.GetValues<Tests.TestEnum>();
 
@@ -40,12 +41,7 @@ internal static class TestEnumGen
 
 	public static string ToStringFast(this Tests.TestEnum value)
 	{
-		if (_stringCache.TryGetValue(value, out string? str))
-			return str;
-
-		str = GetFlagsString(value);
-		_stringCache[value] = str;
-		return str;
+		return _stringCache.GetOrAdd(value, GetFlagsString);
 	}
 
 	private static string GetFlagsString(Tests.TestEnum value)
@@ -70,12 +66,17 @@ internal static class TestEnumGen
 
 	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.TestEnum value)
 	{
-		if (_utf8Cache.TryGetValue(value, out byte[]? bytes))
-			return new ReadOnlySpan<byte>(bytes);
+		byte[] bytes = _utf8Cache.GetOrAdd(value, GetNullTerminatedUtf8Bytes);
+		return new ReadOnlySpan<byte>(bytes, 0, bytes.Length - 1);
+	}
 
-		bytes = Encoding.UTF8.GetBytes(value.ToStringFast());
-		_utf8Cache[value] = bytes;
-		return new ReadOnlySpan<byte>(bytes);
+	private static byte[] GetNullTerminatedUtf8Bytes(Tests.TestEnum value)
+	{
+		// Allocate one extra byte so the buffer is null-terminated beyond the span, matching u8 literals.
+		string str = value.ToStringFast();
+		byte[] bytes = new byte[Encoding.UTF8.GetByteCount(str) + 1];
+		Encoding.UTF8.GetBytes(str, bytes);
+		return bytes;
 	}
 
 	public static int GetIndex(this Tests.TestEnum value)

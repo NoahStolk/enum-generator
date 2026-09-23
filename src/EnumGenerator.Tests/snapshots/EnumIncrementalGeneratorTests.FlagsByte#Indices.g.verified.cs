@@ -6,6 +6,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -25,20 +26,20 @@ public static class IndicesGen
 		Tests.Indices.N7 |
 		Tests.Indices.N8;
 
-	private static readonly Dictionary<Tests.Indices, string> _stringCache = new()
+	private static readonly ConcurrentDictionary<Tests.Indices, string> _stringCache = new()
 	{
-		{ Tests.Indices.None, "None" },
-		{ Tests.Indices.N1, "N1" },
-		{ Tests.Indices.N2, "N2" },
-		{ Tests.Indices.N3, "N3" },
-		{ Tests.Indices.N4, "N4" },
-		{ Tests.Indices.N5, "N5" },
-		{ Tests.Indices.N6, "N6" },
-		{ Tests.Indices.N7, "N7" },
-		{ Tests.Indices.N8, "N8" },
+		[Tests.Indices.None] = "None",
+		[Tests.Indices.N1] = "N1",
+		[Tests.Indices.N2] = "N2",
+		[Tests.Indices.N3] = "N3",
+		[Tests.Indices.N4] = "N4",
+		[Tests.Indices.N5] = "N5",
+		[Tests.Indices.N6] = "N6",
+		[Tests.Indices.N7] = "N7",
+		[Tests.Indices.N8] = "N8",
 	};
 
-	private static readonly Dictionary<Tests.Indices, byte[]> _utf8Cache = new();
+	private static readonly ConcurrentDictionary<Tests.Indices, byte[]> _utf8Cache = new();
 
 	public static IReadOnlyList<Tests.Indices> Values { get; } = Enum.GetValues<Tests.Indices>();
 
@@ -46,12 +47,7 @@ public static class IndicesGen
 
 	public static string ToStringFast(this Tests.Indices value)
 	{
-		if (_stringCache.TryGetValue(value, out string? str))
-			return str;
-
-		str = GetFlagsString(value);
-		_stringCache[value] = str;
-		return str;
+		return _stringCache.GetOrAdd(value, GetFlagsString);
 	}
 
 	private static string GetFlagsString(Tests.Indices value)
@@ -76,12 +72,17 @@ public static class IndicesGen
 
 	public static ReadOnlySpan<byte> AsUtf8Span(this Tests.Indices value)
 	{
-		if (_utf8Cache.TryGetValue(value, out byte[]? bytes))
-			return new ReadOnlySpan<byte>(bytes);
+		byte[] bytes = _utf8Cache.GetOrAdd(value, GetNullTerminatedUtf8Bytes);
+		return new ReadOnlySpan<byte>(bytes, 0, bytes.Length - 1);
+	}
 
-		bytes = Encoding.UTF8.GetBytes(value.ToStringFast());
-		_utf8Cache[value] = bytes;
-		return new ReadOnlySpan<byte>(bytes);
+	private static byte[] GetNullTerminatedUtf8Bytes(Tests.Indices value)
+	{
+		// Allocate one extra byte so the buffer is null-terminated beyond the span, matching u8 literals.
+		string str = value.ToStringFast();
+		byte[] bytes = new byte[Encoding.UTF8.GetByteCount(str) + 1];
+		Encoding.UTF8.GetBytes(str, bytes);
+		return bytes;
 	}
 
 	public static int GetIndex(this Tests.Indices value)

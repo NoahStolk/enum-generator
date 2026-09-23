@@ -1,4 +1,6 @@
 ﻿using EnumGenerator.Tests.Integration.Enums;
+using System.Runtime.InteropServices;
+using System.Text;
 using TUnit.Assertions.Enums;
 
 namespace EnumGenerator.Tests.Integration;
@@ -80,6 +82,26 @@ public sealed class EnumTests
 		await Assert.That((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).ToStringFast()).IsEqualTo("Value A, Value B, Value C");
 		await Assert.That((NamedFlagsType.B | NamedFlagsType.D).ToStringFast()).IsEqualTo("Value B, Value D");
 		await Assert.That((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).ToStringFast()).IsEqualTo("Value A, Value B, Value C, Value D, Value E");
+	}
+
+	[Test]
+	public async Task AsUtf8SpanIsNullTerminated()
+	{
+		// Documents the contract only: the byte past an unterminated array is usually zeroed padding anyway, so this cannot catch a regression on its own. The flags snapshots pin the generated terminator.
+		await Assert.That(ByteAfterSpan(IntegerType.Byte.AsUtf8Span())).IsEqualTo((byte)0);
+		await Assert.That(ByteAfterSpan(Language.CSharp.AsUtf8Span())).IsEqualTo((byte)0);
+
+		await Assert.That(ByteAfterSpan(FlagsType.A.AsUtf8Span())).IsEqualTo((byte)0);
+		await Assert.That(ByteAfterSpan((FlagsType.A | FlagsType.B).AsUtf8Span())).IsEqualTo((byte)0);
+
+		// Second call hits the cache.
+		await Assert.That(ByteAfterSpan((FlagsType.A | FlagsType.B).AsUtf8Span())).IsEqualTo((byte)0);
+		await Assert.That((FlagsType.A | FlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
+
+		static byte ByteAfterSpan(ReadOnlySpan<byte> span)
+		{
+			return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(span), span.Length + 1)[span.Length];
+		}
 	}
 
 	[Test]
@@ -366,5 +388,21 @@ public sealed class EnumTests
 		await Assert.That(UnderlyingTypedLong.B.IsDefined()).IsTrue();
 		await Assert.That(UnderlyingTypedLong.C.IsDefined()).IsTrue();
 		await Assert.That(((UnderlyingTypedLong)3).IsDefined()).IsFalse();
+	}
+
+	[Test]
+	public async Task FlagsCachesAreThreadSafe()
+	{
+		// Every combination is uncached on first use, so all threads insert into the caches concurrently.
+		int mismatches = 0;
+		Parallel.For(1, ushort.MaxValue + 1, i =>
+		{
+			WideFlagsType value = (WideFlagsType)i;
+			string expected = string.Join(", ", Enumerable.Range(0, 16).Where(bit => (i & (1 << bit)) != 0).Select(bit => $"F{bit}"));
+			if (value.ToStringFast() != expected || !value.AsUtf8Span().SequenceEqual(Encoding.UTF8.GetBytes(expected)))
+				Interlocked.Increment(ref mismatches);
+		});
+
+		await Assert.That(mismatches).IsEqualTo(0);
 	}
 }
