@@ -13,7 +13,7 @@
 
   <PropertyGroup Label="Package configuration">
     <PackageId>NoahStolk.EnumGenerator</PackageId>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Authors>Noah Stolk</Authors>
     <Copyright>Copyright © Noah Stolk</Copyright>
     <RepositoryType>git</RepositoryType>
