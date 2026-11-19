@@ -17,7 +17,10 @@ internal sealed class EnumModelBuilder(SemanticModel semanticModel, EnumDeclarat
 			accessibility: enumSymbol.DeclaredAccessibility.ToString().ToLowerInvariant(),
 			members: GetMembers(),
 			hasFlagsAttribute: enumDeclarationSyntax.HasAttribute(semanticModel, "System.FlagsAttribute"),
-			generatedClassName: enumDeclarationSyntax.GetAttributeArgumentValue<string>(semanticModel, $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}", "GeneratedClassName"),
+			generatedClassName: enumDeclarationSyntax.GetAttributeArgumentValue<string>(
+				semanticModel: semanticModel,
+				attributeFullName: $"{GeneratorConstants.RootNamespace}.{GeneratorConstants.GenerateEnumUtilitiesAttributeName}",
+				argumentName: "GeneratedClassName"),
 			enumUnderlyingTypeName: GetEnumUnderlyingTypeString(enumSymbol.EnumUnderlyingType),
 			binaryReaderMethodName: GetBinaryReaderMethodName(enumSymbol.EnumUnderlyingType));
 	}

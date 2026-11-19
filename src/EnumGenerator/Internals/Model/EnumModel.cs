@@ -34,7 +34,7 @@ internal sealed record EnumModel
 		}
 		else
 		{
-			UniqueMembers = members.DistinctBy(m => m.ConstantValue).ToList();
+			UniqueMembers = [.. members.DistinctBy(m => m.ConstantValue)];
 		}
 
 		static bool IsPowerOfTwo(BigInteger value)

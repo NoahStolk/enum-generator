@@ -28,10 +28,10 @@ internal sealed class FlagsEnumCodeGenerator(EnumModel enumModel)
 		for (int i = 0; i < enumModel.UniqueMembers.Count; i++)
 		{
 			EnumMemberModel member = enumModel.UniqueMembers[i];
-			if (i == enumModel.UniqueMembers.Count - 1)
-				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name};");
-			else
-				writer.WriteLine($"{enumModel.EnumTypeName}.{member.Name} |");
+			writer.WriteLine(
+				i == enumModel.UniqueMembers.Count - 1
+					? $"{enumModel.EnumTypeName}.{member.Name};"
+					: $"{enumModel.EnumTypeName}.{member.Name} |");
 		}
 
 		writer.WriteLine();

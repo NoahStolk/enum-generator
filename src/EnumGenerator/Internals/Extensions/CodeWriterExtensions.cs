@@ -95,10 +95,10 @@ internal static class CodeWriterExtensions
 		{
 			writer.WriteLine($"public static bool IsDefined(this {enumModel.EnumTypeName} value)");
 			writer.StartBlock();
-			if (enumModel.UniqueMembers.Count == 0)
-				writer.WriteLine("return false;");
-			else
-				writer.WriteLine($"return _definedValues.Contains(({enumModel.EnumUnderlyingTypeName})value);");
+			writer.WriteLine(
+				enumModel.UniqueMembers.Count == 0
+					? "return false;"
+					: $"return _definedValues.Contains(({enumModel.EnumUnderlyingTypeName})value);");
 			writer.EndBlock();
 		}
 	}
