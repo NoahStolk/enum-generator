@@ -22,21 +22,4 @@ internal static class SourceBuilderUtils
 
 		return template.Replace("\r", string.Empty);
 	}
-
-	public static string ToEscapedLocal(string name)
-	{
-		name = name.RemovePrefix("@").RemovePrefix("_");
-		return $"@{name.FirstCharToLowerCase()}";
-	}
-
-	private static string RemovePrefix(this string name, string prefix)
-	{
-		if (!name.StartsWith(prefix, StringComparison.Ordinal))
-			return name;
-
-		if (name.Length == prefix.Length)
-			throw new InvalidOperationException($"Invalid identifier '{name}'.");
-
-		return name.Substring(prefix.Length);
-	}
 }
