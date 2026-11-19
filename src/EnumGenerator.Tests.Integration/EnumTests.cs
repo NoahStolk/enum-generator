@@ -96,7 +96,7 @@ public sealed class EnumTests
 
 		// Second call hits the cache.
 		await Assert.That(ByteAfterSpan((FlagsType.A | FlagsType.B).AsUtf8Span())).IsEqualTo((byte)0);
-		await Assert.That((FlagsType.A | FlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsType.A | FlagsType.B).AsUtf8Span()]).IsEquivalentTo([.. "A, B"u8], CollectionOrdering.Matching);
 
 		static byte ByteAfterSpan(ReadOnlySpan<byte> span)
 		{
@@ -117,52 +117,53 @@ public sealed class EnumTests
 
 		await Assert.That("Sunday"u8.SequenceEqual(DayOfWeek.Sunday.AsUtf8Span())).IsTrue();
 		await Assert.That("Unspecified"u8.SequenceEqual(DateTimeKind.Unspecified.AsUtf8Span())).IsTrue();
-		await Assert.That(() => { _ = ((DateTimeKind)3).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((DateTimeKind)3).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
 
-		await Assert.That(FlagsType.None.AsUtf8Span().ToArray()).IsEquivalentTo("None"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsType.A.AsUtf8Span().ToArray()).IsEquivalentTo("A"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsType.B.AsUtf8Span().ToArray()).IsEquivalentTo("B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsType.C.AsUtf8Span().ToArray()).IsEquivalentTo("C"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsType.D.AsUtf8Span().ToArray()).IsEquivalentTo("D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsType.E.AsUtf8Span().ToArray()).IsEquivalentTo("E"u8.ToArray(), CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.None.AsUtf8Span()]).IsEquivalentTo([.. "None"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.A.AsUtf8Span()]).IsEquivalentTo([.. "A"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.B.AsUtf8Span()]).IsEquivalentTo([.. "B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.C.AsUtf8Span()]).IsEquivalentTo([.. "C"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.D.AsUtf8Span()]).IsEquivalentTo([.. "D"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsType.E.AsUtf8Span()]).IsEquivalentTo([.. "E"u8], CollectionOrdering.Matching);
 
-		await Assert.That((FlagsType.None | FlagsType.A | FlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsType.A | FlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsType.A | FlagsType.B | FlagsType.C).AsUtf8Span().ToArray()).IsEquivalentTo("A, B, C"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsType.B | FlagsType.D).AsUtf8Span().ToArray()).IsEquivalentTo("B, D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).AsUtf8Span().ToArray()).IsEquivalentTo("A, B, C, D, E"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(() => { _ = ((FlagsType)32).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsType)33).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That([.. (FlagsType.None | FlagsType.A | FlagsType.B).AsUtf8Span()]).IsEquivalentTo([.. "A, B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsType.A | FlagsType.B).AsUtf8Span()]).IsEquivalentTo([.. "A, B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsType.A | FlagsType.B | FlagsType.C).AsUtf8Span()]).IsEquivalentTo([.. "A, B, C"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsType.B | FlagsType.D).AsUtf8Span()]).IsEquivalentTo([.. "B, D"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsType.A | FlagsType.B | FlagsType.C | FlagsType.D | FlagsType.E).AsUtf8Span()]).IsEquivalentTo([.. "A, B, C, D, E"u8], CollectionOrdering.Matching);
+		await Assert.That(() => _ = ((FlagsType)32).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsType)33).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
 
-		await Assert.That(FlagsTypeWithMissingBits.None.AsUtf8Span().ToArray()).IsEquivalentTo("None"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsTypeWithMissingBits.A.AsUtf8Span().ToArray()).IsEquivalentTo("A"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsTypeWithMissingBits.B.AsUtf8Span().ToArray()).IsEquivalentTo("B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)4).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)5).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)6).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)7).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(FlagsTypeWithMissingBits.D.AsUtf8Span().ToArray()).IsEquivalentTo("D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(FlagsTypeWithMissingBits.E.AsUtf8Span().ToArray()).IsEquivalentTo("E"u8.ToArray(), CollectionOrdering.Matching);
+		await Assert.That([.. FlagsTypeWithMissingBits.None.AsUtf8Span()]).IsEquivalentTo([.. "None"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsTypeWithMissingBits.A.AsUtf8Span()]).IsEquivalentTo([.. "A"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsTypeWithMissingBits.B.AsUtf8Span()]).IsEquivalentTo([.. "B"u8], CollectionOrdering.Matching);
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)4).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)5).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)6).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)7).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That([.. FlagsTypeWithMissingBits.D.AsUtf8Span()]).IsEquivalentTo([.. "D"u8], CollectionOrdering.Matching);
+		await Assert.That([.. FlagsTypeWithMissingBits.E.AsUtf8Span()]).IsEquivalentTo([.. "E"u8], CollectionOrdering.Matching);
 
-		await Assert.That((FlagsTypeWithMissingBits.None | FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span().ToArray()).IsEquivalentTo("A, B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((FlagsTypeWithMissingBits.B | FlagsTypeWithMissingBits.D).AsUtf8Span().ToArray()).IsEquivalentTo("B, D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)31).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)32).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
-		await Assert.That(() => { _ = ((FlagsTypeWithMissingBits)33).AsUtf8Span(); }).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That([.. (FlagsTypeWithMissingBits.None | FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span()]).IsEquivalentTo([.. "A, B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsTypeWithMissingBits.A | FlagsTypeWithMissingBits.B).AsUtf8Span()]).IsEquivalentTo([.. "A, B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (FlagsTypeWithMissingBits.B | FlagsTypeWithMissingBits.D).AsUtf8Span()]).IsEquivalentTo([.. "B, D"u8], CollectionOrdering.Matching);
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)31).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)32).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
+		await Assert.That(() => _ = ((FlagsTypeWithMissingBits)33).AsUtf8Span()).ThrowsExactly<ArgumentOutOfRangeException>();
 
-		await Assert.That(NamedFlagsType.None.AsUtf8Span().ToArray()).IsEquivalentTo("No value"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(NamedFlagsType.A.AsUtf8Span().ToArray()).IsEquivalentTo("Value A"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(NamedFlagsType.B.AsUtf8Span().ToArray()).IsEquivalentTo("Value B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(NamedFlagsType.C.AsUtf8Span().ToArray()).IsEquivalentTo("Value C"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(NamedFlagsType.D.AsUtf8Span().ToArray()).IsEquivalentTo("Value D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That(NamedFlagsType.E.AsUtf8Span().ToArray()).IsEquivalentTo("Value E"u8.ToArray(), CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.None.AsUtf8Span()]).IsEquivalentTo([.. "No value"u8], CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.A.AsUtf8Span()]).IsEquivalentTo([.. "Value A"u8], CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.B.AsUtf8Span()]).IsEquivalentTo([.. "Value B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.C.AsUtf8Span()]).IsEquivalentTo([.. "Value C"u8], CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.D.AsUtf8Span()]).IsEquivalentTo([.. "Value D"u8], CollectionOrdering.Matching);
+		await Assert.That([.. NamedFlagsType.E.AsUtf8Span()]).IsEquivalentTo([.. "Value E"u8], CollectionOrdering.Matching);
 
-		await Assert.That((NamedFlagsType.None | NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("Value A, Value B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span().ToArray()).IsEquivalentTo("Value A, Value B"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).AsUtf8Span().ToArray()).IsEquivalentTo("Value A, Value B, Value C"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((NamedFlagsType.B | NamedFlagsType.D).AsUtf8Span().ToArray()).IsEquivalentTo("Value B, Value D"u8.ToArray(), CollectionOrdering.Matching);
-		await Assert.That((NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).AsUtf8Span().ToArray()).IsEquivalentTo("Value A, Value B, Value C, Value D, Value E"u8.ToArray(), CollectionOrdering.Matching);
+		await Assert.That([.. (NamedFlagsType.None | NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span()]).IsEquivalentTo([.. "Value A, Value B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (NamedFlagsType.A | NamedFlagsType.B).AsUtf8Span()]).IsEquivalentTo([.. "Value A, Value B"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C).AsUtf8Span()]).IsEquivalentTo([.. "Value A, Value B, Value C"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (NamedFlagsType.B | NamedFlagsType.D).AsUtf8Span()]).IsEquivalentTo([.. "Value B, Value D"u8], CollectionOrdering.Matching);
+		await Assert.That([.. (NamedFlagsType.A | NamedFlagsType.B | NamedFlagsType.C | NamedFlagsType.D | NamedFlagsType.E).AsUtf8Span()])
+			.IsEquivalentTo([.. "Value A, Value B, Value C, Value D, Value E"u8], CollectionOrdering.Matching);
 	}
 
 	[Test]
@@ -296,8 +297,8 @@ public sealed class EnumTests
 	[Test]
 	public async Task BinarySerializationWorksCorrectly()
 	{
-		using MemoryStream ms = new();
-		using BinaryWriter writer = new(ms);
+		await using MemoryStream ms = new();
+		await using BinaryWriter writer = new(ms);
 		using BinaryReader reader = new(ms);
 
 		await RoundTrip<byte, UnderlyingTypedByte>(writer, reader, UnderlyingTypedByte.A, UnderlyingTypedByteGen.Write, UnderlyingTypedByteGen.ReadUnderlyingTypedByte);

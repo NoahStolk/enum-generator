@@ -12,7 +12,7 @@ public sealed class GeneratedAttributesTests
 	[Test]
 	public async Task GeneratedAttributes()
 	{
-		string code =
+		const string code =
 			"""
 			using EnumGenerator;
 			namespace Tests;
