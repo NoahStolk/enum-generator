@@ -5,50 +5,53 @@ namespace EnumGenerator.Internals.Extensions;
 
 internal static class MemberDeclarationSyntaxExtensions
 {
-	public static bool HasAttribute(this MemberDeclarationSyntax memberDeclarationSyntax, SemanticModel semanticModel, string attributeFullName)
+	extension(MemberDeclarationSyntax memberDeclarationSyntax)
 	{
-		foreach (AttributeListSyntax attributeListSyntax in memberDeclarationSyntax.AttributeLists)
+		public bool HasAttribute(SemanticModel semanticModel, string attributeFullName)
 		{
-			foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
+			foreach (AttributeListSyntax attributeListSyntax in memberDeclarationSyntax.AttributeLists)
 			{
-				if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-					continue;
-
-				if (attributeSymbol.ContainingType.ToDisplayString() != attributeFullName)
-					continue;
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static T? GetAttributeArgumentValue<T>(this MemberDeclarationSyntax memberDeclarationSyntax, SemanticModel semanticModel, string attributeFullName, string argumentName)
-	{
-		foreach (AttributeListSyntax attributeListSyntax in memberDeclarationSyntax.AttributeLists)
-		{
-			foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
-			{
-				if (attributeSyntax.ArgumentList == null)
-					continue;
-
-				if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-					continue;
-
-				if (attributeSymbol.ContainingType.ToDisplayString() != attributeFullName)
-					continue;
-
-				foreach (AttributeArgumentSyntax argumentSyntax in attributeSyntax.ArgumentList.Arguments)
+				foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
 				{
-					if (argumentSyntax.NameEquals?.Name.Identifier.Text != argumentName)
+					if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
 						continue;
 
-					return (T?)semanticModel.GetConstantValue(argumentSyntax.Expression).Value;
+					if (attributeSymbol.ContainingType.ToDisplayString() != attributeFullName)
+						continue;
+
+					return true;
 				}
 			}
+
+			return false;
 		}
 
-		return default;
+		public T? GetAttributeArgumentValue<T>(SemanticModel semanticModel, string attributeFullName, string argumentName)
+		{
+			foreach (AttributeListSyntax attributeListSyntax in memberDeclarationSyntax.AttributeLists)
+			{
+				foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
+				{
+					if (attributeSyntax.ArgumentList == null)
+						continue;
+
+					if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+						continue;
+
+					if (attributeSymbol.ContainingType.ToDisplayString() != attributeFullName)
+						continue;
+
+					foreach (AttributeArgumentSyntax argumentSyntax in attributeSyntax.ArgumentList.Arguments)
+					{
+						if (argumentSyntax.NameEquals?.Name.Identifier.Text != argumentName)
+							continue;
+
+						return (T?)semanticModel.GetConstantValue(argumentSyntax.Expression).Value;
+					}
+				}
+			}
+
+			return default;
+		}
 	}
 }
